@@ -18,7 +18,7 @@ const Login = () => {
             setError('');
             setLoading(true);
             await signInWithEmailAndPassword(auth, email, password);
-            navigate('/home');
+            navigate('/');
         } catch (err) {
             setError('Failed to log in');
             console.error(err);
@@ -32,7 +32,7 @@ const Login = () => {
             setError('');
             setLoading(true);
             await signInWithPopup(auth, googleProvider);
-            navigate('/home');
+            navigate('/');
         } catch (err) {
             setError('Failed to log in with Google');
             console.error(err);

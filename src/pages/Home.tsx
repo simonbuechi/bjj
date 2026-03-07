@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip } from '@mui/material';
+import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { ViewModule, ViewList, ChevronRight } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { getTechniques } from '../services/db';
@@ -57,15 +57,29 @@ const Home = () => {
 
     return (
         <Container maxWidth="lg">
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
-                <Typography variant="h3" component="h1">
-                    BJJ Techniques
-                </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
+                {techniques.length > 0 && (
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <FormControl size="small" sx={{ minWidth: 200 }}>
+                            <InputLabel id="technique-filter-label">Filter by Type</InputLabel>
+                            <Select
+                                labelId="technique-filter-label"
+                                id="technique-filter"
+                                value={filter}
+                                label="Filter by Type"
+                                onChange={(e) => setFilter(e.target.value as TechniqueType | 'all')}
+                                sx={{ textTransform: 'capitalize' }}
+                            >
+                                <MenuItem value="all">All Types</MenuItem>
+                                <MenuItem value="position" sx={{ textTransform: 'capitalize' }}>Position</MenuItem>
+                                <MenuItem value="submission" sx={{ textTransform: 'capitalize' }}>Submission</MenuItem>
+                                <MenuItem value="escape" sx={{ textTransform: 'capitalize' }}>Escape</MenuItem>
+                                <MenuItem value="guard pass" sx={{ textTransform: 'capitalize' }}>Guard Pass</MenuItem>
+                                <MenuItem value="sweep" sx={{ textTransform: 'capitalize' }}>Sweep</MenuItem>
+                                <MenuItem value="frame" sx={{ textTransform: 'capitalize' }}>Frame</MenuItem>
+                            </Select>
+                        </FormControl>
 
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-
-
-                    {techniques.length > 0 && (
                         <ToggleButtonGroup
                             value={viewMode}
                             exclusive
@@ -80,32 +94,9 @@ const Home = () => {
                                 <ViewList />
                             </ToggleButton>
                         </ToggleButtonGroup>
-                    )}
-                </Box>
+                    </Box>
+                )}
             </Box>
-
-            {techniques.length > 0 && (
-                <Box sx={{ mb: 4, display: 'flex', overflowX: 'auto', pb: 1 }}>
-                    <ToggleButtonGroup
-                        value={filter}
-                        exclusive
-                        onChange={(_e, newFilter) => {
-                            if (newFilter !== null) setFilter(newFilter);
-                        }}
-                        aria-label="technique filter"
-                        size="small"
-                        color="primary"
-                    >
-                        <ToggleButton value="all" sx={{ textTransform: 'capitalize', px: 3 }}>All</ToggleButton>
-                        <ToggleButton value="position" sx={{ textTransform: 'capitalize', px: 3 }}>Position</ToggleButton>
-                        <ToggleButton value="submission" sx={{ textTransform: 'capitalize', px: 3 }}>Submission</ToggleButton>
-                        <ToggleButton value="escape" sx={{ textTransform: 'capitalize', px: 3 }}>Escape</ToggleButton>
-                        <ToggleButton value="guard pass" sx={{ textTransform: 'capitalize', px: 3 }}>Guard Pass</ToggleButton>
-                        <ToggleButton value="sweep" sx={{ textTransform: 'capitalize', px: 3 }}>Sweep</ToggleButton>
-                        <ToggleButton value="frame" sx={{ textTransform: 'capitalize', px: 3 }}>Frame</ToggleButton>
-                    </ToggleButtonGroup>
-                </Box>
-            )}
 
             {error && <Alert severity="error" sx={{ mb: 4 }}>{error}</Alert>}
 
