@@ -100,6 +100,8 @@ const Home = () => {
                         <ToggleButton value="position" sx={{ textTransform: 'capitalize', px: 3 }}>Position</ToggleButton>
                         <ToggleButton value="submission" sx={{ textTransform: 'capitalize', px: 3 }}>Submission</ToggleButton>
                         <ToggleButton value="escape" sx={{ textTransform: 'capitalize', px: 3 }}>Escape</ToggleButton>
+                        <ToggleButton value="guard pass" sx={{ textTransform: 'capitalize', px: 3 }}>Guard Pass</ToggleButton>
+                        <ToggleButton value="sweep" sx={{ textTransform: 'capitalize', px: 3 }}>Sweep</ToggleButton>
                         <ToggleButton value="frame" sx={{ textTransform: 'capitalize', px: 3 }}>Frame</ToggleButton>
                     </ToggleButtonGroup>
                 </Box>

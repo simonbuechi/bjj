@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link as RouterLink } from 'react-router-dom';
+import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
     Typography, Box, CircularProgress, Container,
-    Chip, Grid, Paper, Divider, Button, ToggleButtonGroup, ToggleButton
+    Chip, Grid, Paper, Divider, Button, ToggleButtonGroup, ToggleButton,
+    Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions
 } from '@mui/material';
-import { Favorite, MenuBook, ErrorOutline, School } from '@mui/icons-material';
-import { getTechniqueById, getUserProfile, updateUserProfile } from '../services/db';
+import { Favorite, MenuBook, ErrorOutline, School, Delete } from '@mui/icons-material';
+import { getTechniqueById, getUserProfile, updateUserProfile, deleteTechnique } from '../services/db';
 import type { Technique, UserProfile, MarkedStatus } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 const TechniqueDetails = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const { currentUser } = useAuth();
 
     const [technique, setTechnique] = useState<Technique | null>(null);
@@ -18,6 +20,8 @@ const TechniqueDetails = () => {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -76,6 +80,20 @@ const TechniqueDetails = () => {
         }
     };
 
+    const handleDelete = async () => {
+        if (!id) return;
+        try {
+            setDeleting(true);
+            await deleteTechnique(id);
+            navigate('/');
+        } catch (err) {
+            console.error("Failed to delete technique", err);
+            setError("Failed to delete technique. Please try again.");
+            setDeleteDialogOpen(false);
+            setDeleting(false);
+        }
+    };
+
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}><CircularProgress /></Box>;
     if (error || !technique) return <Container><Typography color="error" mt={4}>{error || 'Not found'}</Typography></Container>;
 
@@ -98,6 +116,27 @@ const TechniqueDetails = () => {
                                     sx={{ textTransform: 'capitalize' }}
                                 />
                             </Box>
+                            {currentUser && (
+                                <Box display="flex" gap={1}>
+                                    <Button
+                                        component={RouterLink}
+                                        to={`/techniques/${technique.id}/edit`}
+                                        variant="outlined"
+                                        color="primary"
+                                        size="small"
+                                    >
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        color="error"
+                                        size="small"
+                                        onClick={() => setDeleteDialogOpen(true)}
+                                    >
+                                        <Delete fontSize="small" />
+                                    </Button>
+                                </Box>
+                            )}
                         </Box>
 
                         {technique.images && technique.images.length > 0 && (
@@ -180,6 +219,24 @@ const TechniqueDetails = () => {
                     </Grid>
                 </Grid>
             </Paper>
+
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={() => setDeleteDialogOpen(false)}
+            >
+                <DialogTitle>Delete Technique?</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete "{technique.name}"? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>Cancel</Button>
+                    <Button onClick={handleDelete} color="error" variant="contained" disabled={deleting}>
+                        {deleting ? 'Deleting...' : 'Delete'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 };

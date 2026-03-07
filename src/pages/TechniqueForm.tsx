@@ -7,7 +7,7 @@ import {
 import { getTechniqueById, createTechnique, updateTechnique, getTechniques } from '../services/db';
 import type { Technique, TechniqueType } from '../types';
 
-const TECHNIQUE_TYPES: TechniqueType[] = ['position', 'submission', 'escape', 'frame'];
+const TECHNIQUE_TYPES: TechniqueType[] = ['position', 'submission', 'escape', 'guard pass', 'sweep', 'frame'];
 
 export default function TechniqueForm() {
     const { id } = useParams<{ id: string }>();

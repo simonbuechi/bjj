@@ -27,6 +27,11 @@ export const updateTechnique = async (id: string, data: Partial<Technique>): Pro
     await updateDoc(docRef, data);
 };
 
+export const deleteTechnique = async (id: string): Promise<void> => {
+    const docRef = doc(db, 'techniques', id);
+    await deleteDoc(docRef);
+};
+
 // User Profiles
 export const getUserProfile = async (uid: string): Promise<UserProfile | null> => {
     const docRef = doc(db, 'users', uid);

@@ -1,4 +1,4 @@
-export type TechniqueType = 'frame' | 'submission' | 'position' | 'escape';
+export type TechniqueType = 'frame' | 'submission' | 'position' | 'escape' | 'guard pass' | 'sweep';
 
 export interface Technique {
     id: string;
