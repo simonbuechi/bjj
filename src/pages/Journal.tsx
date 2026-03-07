@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import {
     Typography, Box, Container, Paper, TextField,
     Button, CircularProgress, Alert, Grid, Divider,
-    List, Chip, Autocomplete
+    List, Chip, Autocomplete, MenuItem, FormControlLabel, Switch, Rating
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { getJournalEntries, createJournalEntry, getTechniques } from '../services/db';
-import type { JournalEntry, Technique } from '../types';
+import type { JournalEntry, Technique, SessionType } from '../types';
+
+const SESSION_TYPES: SessionType[] = ['Regular class', 'Private class', 'Open mat', 'Seminar', 'Camp', 'Competition'];
 
 const Journal = () => {
     const { currentUser } = useAuth();
@@ -18,6 +20,12 @@ const Journal = () => {
 
     // New entry form state
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [time, setTime] = useState('');
+    const [isGi, setIsGi] = useState(true);
+    const [length, setLength] = useState<number | ''>(90);
+    const [sessionType, setSessionType] = useState<SessionType>('Regular class');
+    const [intensity, setIntensity] = useState<number | null>(3);
+
     const [comment, setComment] = useState('');
     const [selectedTechniques, setSelectedTechniques] = useState<Technique[]>([]);
     const [submitting, setSubmitting] = useState(false);
@@ -54,6 +62,11 @@ const Journal = () => {
 
             const newEntryData = {
                 date,
+                time,
+                isGi,
+                length: length || undefined,
+                sessionType,
+                intensity: intensity || undefined,
                 comment,
                 techniqueIds: selectedTechniques.map(t => t.id)
             };
@@ -66,6 +79,10 @@ const Journal = () => {
             // Reset form
             setComment('');
             setSelectedTechniques([]);
+            setLength(90);
+            setIntensity(3);
+            setIsGi(true);
+            setSessionType('Regular class');
 
         } catch (err) {
             console.error(err);
@@ -96,16 +113,81 @@ const Journal = () => {
                         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
                         <form onSubmit={handleSubmit}>
-                            <TextField
-                                label="Date"
-                                type="date"
-                                fullWidth
-                                margin="normal"
-                                value={date}
-                                onChange={(e) => setDate(e.target.value)}
-                                required
-                                InputLabelProps={{ shrink: true }}
-                            />
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        label="Date"
+                                        type="date"
+                                        fullWidth
+                                        margin="normal"
+                                        value={date}
+                                        onChange={(e) => setDate(e.target.value)}
+                                        required
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        label="Time"
+                                        type="time"
+                                        fullWidth
+                                        margin="normal"
+                                        value={time}
+                                        onChange={(e) => setTime(e.target.value)}
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+                                </Grid>
+                            </Grid>
+
+                            <Grid container spacing={2} sx={{ mt: 1, mb: 1 }}>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        select
+                                        label="Session Type"
+                                        fullWidth
+                                        value={sessionType}
+                                        onChange={(e) => setSessionType(e.target.value as SessionType)}
+                                    >
+                                        {SESSION_TYPES.map((type) => (
+                                            <MenuItem key={type} value={type}>
+                                                {type}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        label="Length (min)"
+                                        type="number"
+                                        fullWidth
+                                        value={length}
+                                        onChange={(e) => setLength(e.target.value === '' ? '' : Number(e.target.value))}
+                                        inputProps={{ min: 0, step: 15 }}
+                                    />
+                                </Grid>
+                            </Grid>
+
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, mt: 1 }}>
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={isGi}
+                                            onChange={(e) => setIsGi(e.target.checked)}
+                                            color="primary"
+                                        />
+                                    }
+                                    label={isGi ? "Gi" : "No-Gi"}
+                                />
+
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Typography component="legend" sx={{ mr: 2 }}>Intensity</Typography>
+                                    <Rating
+                                        name="intensity"
+                                        value={intensity}
+                                        onChange={(_, newValue) => setIntensity(newValue)}
+                                    />
+                                </Box>
+                            </Box>
 
                             <Autocomplete
                                 multiple
@@ -166,10 +248,35 @@ const Journal = () => {
                         <List sx={{ p: 0 }}>
                             {entries.map((entry) => (
                                 <Paper key={entry.id} variant="outlined" sx={{ mb: 2, p: 2, borderRadius: 2 }}>
-                                    <Box display="flex" justifyContent="space-between" mb={1}>
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                                         <Typography variant="h6" color="primary">
                                             {new Date(entry.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+                                            {entry.time && ` • ${entry.time}`}
                                         </Typography>
+                                    </Box>
+
+                                    <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
+                                        <Chip
+                                            size="small"
+                                            label={entry.isGi !== false ? 'Gi' : 'No-Gi'}
+                                            color={entry.isGi !== false ? 'primary' : 'secondary'}
+                                            variant="outlined"
+                                        />
+                                        {entry.sessionType && (
+                                            <Chip size="small" label={entry.sessionType} variant="outlined" />
+                                        )}
+                                        {entry.length && (
+                                            <Chip size="small" label={`${entry.length} min`} variant="outlined" />
+                                        )}
+                                        {entry.intensity && (
+                                            <Chip
+                                                size="small"
+                                                icon={<Rating value={entry.intensity} readOnly size="small" max={5} sx={{ fontSize: '1rem', ml: 0.5 }} />}
+                                                label={`Intensity`}
+                                                variant="outlined"
+                                                sx={{ '& .MuiChip-icon': { color: 'gold' } }}
+                                            />
+                                        )}
                                     </Box>
 
                                     {entry.techniqueIds && entry.techniqueIds.length > 0 && (

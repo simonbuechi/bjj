@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Typography, Box, TextField, Button, Paper, Alert } from '@mui/material';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '../firebase/config';
+import GoogleIcon from '@mui/icons-material/Google';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Register = () => {
@@ -26,6 +27,20 @@ const Register = () => {
             navigate('/');
         } catch (err) {
             setError('Failed to create an account');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleRegister = async () => {
+        try {
+            setError('');
+            setLoading(true);
+            await signInWithPopup(auth, googleProvider);
+            navigate('/');
+        } catch (err) {
+            setError('Failed to sign up with Google');
             console.error(err);
         } finally {
             setLoading(false);
@@ -77,6 +92,17 @@ const Register = () => {
                         sx={{ mt: 3, mb: 2 }}
                     >
                         Sign Up
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        fullWidth
+                        size="large"
+                        disabled={loading}
+                        onClick={handleGoogleRegister}
+                        startIcon={<GoogleIcon />}
+                        sx={{ mb: 2 }}
+                    >
+                        Sign up with Google
                     </Button>
                 </form>
                 <Typography align="center" variant="body2">

@@ -18,8 +18,7 @@ const Navbar = () => {
 
     const pages = [
         { title: 'Journal', path: '/journal' },
-        { title: 'Profile', path: '/profile' },
-        { title: 'Login', path: '/login' }
+        { title: 'Profile', path: '/profile' }
     ];
 
     return (

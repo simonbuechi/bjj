@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Typography, Box, TextField, Button, Paper, Alert } from '@mui/material';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '../firebase/config';
+import GoogleIcon from '@mui/icons-material/Google';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
@@ -20,6 +21,20 @@ const Login = () => {
             navigate('/home');
         } catch (err) {
             setError('Failed to log in');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        try {
+            setError('');
+            setLoading(true);
+            await signInWithPopup(auth, googleProvider);
+            navigate('/home');
+        } catch (err) {
+            setError('Failed to log in with Google');
             console.error(err);
         } finally {
             setLoading(false);
@@ -62,6 +77,17 @@ const Login = () => {
                         sx={{ mt: 3, mb: 2 }}
                     >
                         Log In
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        fullWidth
+                        size="large"
+                        disabled={loading}
+                        onClick={handleGoogleLogin}
+                        startIcon={<GoogleIcon />}
+                        sx={{ mb: 2 }}
+                    >
+                        Log in with Google
                     </Button>
                 </form>
                 <Typography align="center" variant="body2">
