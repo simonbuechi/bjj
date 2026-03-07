@@ -86,16 +86,18 @@ const TechniqueDetails = () => {
             <Paper elevation={0} sx={{ p: { xs: 2, md: 4 }, bgcolor: 'background.paper', borderRadius: 2 }}>
                 <Grid container spacing={4}>
                     <Grid size={{ xs: 12, md: 8 }}>
-                        <Box mb={2}>
-                            <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-                                {technique.name}
-                            </Typography>
-                            <Chip
-                                label={technique.type}
-                                color="secondary"
-                                variant="outlined"
-                                sx={{ textTransform: 'capitalize' }}
-                            />
+                        <Box mb={2} display="flex" justifyContent="space-between" alignItems="flex-start">
+                            <Box>
+                                <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                                    {technique.name}
+                                </Typography>
+                                <Chip
+                                    label={technique.type}
+                                    color="secondary"
+                                    variant="outlined"
+                                    sx={{ textTransform: 'capitalize' }}
+                                />
+                            </Box>
                         </Box>
 
                         {technique.images && technique.images.length > 0 && (

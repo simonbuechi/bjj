@@ -17,6 +17,16 @@ export const getTechniqueById = async (id: string): Promise<Technique | null> =>
     return null;
 };
 
+export const createTechnique = async (technique: Omit<Technique, 'id'>): Promise<string> => {
+    const docRef = await addDoc(collection(db, 'techniques'), technique);
+    return docRef.id;
+};
+
+export const updateTechnique = async (id: string, data: Partial<Technique>): Promise<void> => {
+    const docRef = doc(db, 'techniques', id);
+    await updateDoc(docRef, data);
+};
+
 // User Profiles
 export const getUserProfile = async (uid: string): Promise<UserProfile | null> => {
     const docRef = doc(db, 'users', uid);

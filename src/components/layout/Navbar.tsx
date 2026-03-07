@@ -3,9 +3,11 @@ import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem } 
 import { Menu as MenuIcon, Brightness4, Brightness7 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { useAppTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
     const { mode, toggleColorMode } = useAppTheme();
+    const { currentUser } = useAuth();
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {

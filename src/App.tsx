@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import TechniqueDetails from './pages/TechniqueDetails';
+import TechniqueForm from './pages/TechniqueForm';
 import Journal from './pages/Journal';
 
 function App() {
@@ -19,6 +20,22 @@ function App() {
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="techniques/:id" element={<TechniqueDetails />} />
+            <Route
+              path="techniques/new"
+              element={
+                <ProtectedRoute>
+                  <TechniqueForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="techniques/:id/edit"
+              element={
+                <ProtectedRoute>
+                  <TechniqueForm />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="profile"
               element={

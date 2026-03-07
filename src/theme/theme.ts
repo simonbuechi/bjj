@@ -1,30 +1,65 @@
 import { createTheme, type PaletteMode } from '@mui/material/styles';
 
+// ==========================================
+// CENTRAL THEME CONFIGURATION
+// Modify these values to quickly change the app's look and feel
+// ==========================================
+
+export const THEME_COLORS = {
+    light: {
+        primary: '#2563EB',    // Vibrant Blue
+        secondary: '#F59E0B',  // Amber/Warm Orange
+        background: '#FAF9F6', // Soft Off-white
+        paper: '#FFFFFF',
+    },
+    dark: {
+        primary: '#60A5FA',    // Light Blue
+        secondary: '#FBBF24',  // Light Amber
+        background: '#0F172A', // Slate Dark
+        paper: '#1E293B',      // Slate Slightly Lighter
+    }
+};
+
 export const getAppTheme = (mode: PaletteMode) => createTheme({
     palette: {
         mode,
         primary: {
-            main: mode === 'dark' ? '#bb86fc' : '#6200ea',
+            main: mode === 'dark' ? THEME_COLORS.dark.primary : THEME_COLORS.light.primary,
         },
         secondary: {
-            main: mode === 'dark' ? '#03dac6' : '#018786',
+            main: mode === 'dark' ? THEME_COLORS.dark.secondary : THEME_COLORS.light.secondary,
         },
         background: {
-            default: mode === 'dark' ? '#121212' : '#f5f5f5',
-            paper: mode === 'dark' ? '#1e1e1e' : '#ffffff',
+            default: mode === 'dark' ? THEME_COLORS.dark.background : THEME_COLORS.light.background,
+            paper: mode === 'dark' ? THEME_COLORS.dark.paper : THEME_COLORS.light.paper,
         },
     },
     typography: {
-        fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+        fontFamily: '"Poppins", "Inter", "Roboto", "Segoe UI", sans-serif',
         h1: {
             fontWeight: 700,
+            letterSpacing: '-0.02em',
         },
         h2: {
+            fontWeight: 700,
+            letterSpacing: '-0.01em',
+        },
+        h3: {
+            fontWeight: 600,
+        },
+        h4: {
             fontWeight: 600,
         },
         h5: {
             fontWeight: 600,
         },
+        h6: {
+            fontWeight: 600,
+        },
+        button: {
+            fontWeight: 600,
+            letterSpacing: '0.02em',
+        }
     },
     components: {
         MuiButton: {
