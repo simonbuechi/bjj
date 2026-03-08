@@ -36,6 +36,7 @@ const Journal = () => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
+    const [formDialogOpen, setFormDialogOpen] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -117,6 +118,7 @@ const Journal = () => {
         } else {
             setSelectedTechniques([]);
         }
+        setFormDialogOpen(true);
     };
 
     const handleCancelEdit = () => {
@@ -130,6 +132,7 @@ const Journal = () => {
         setIsGi(true);
         setSessionType('Regular class');
         setError('');
+        setFormDialogOpen(false);
     };
 
     const handleDeleteClick = (id: string) => {
@@ -165,18 +168,31 @@ const Journal = () => {
     if (loading) return <Box display="flex" justifyContent="center" mt={8}><CircularProgress /></Box>;
 
     return (
-        <Container maxWidth="lg">
-            <Grid container spacing={4}>
+        <Container maxWidth="md">
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} mt={2}>
+                <Typography variant="h4" component="h1">
+                    Training History
+                </Typography>
+                <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={() => {
+                        handleCancelEdit();
+                        setFormDialogOpen(true);
+                    }}
+                >
+                    Log New Session
+                </Button>
+            </Box>
+            <Divider sx={{ mb: 3 }} />
 
-                {/* New Entry Form */}
-                <Grid size={{ xs: 12, md: 5 }}>
-                    <Paper elevation={3} sx={{ p: 3, borderRadius: 2, position: 'sticky', top: 24 }}>
-                        <Typography variant="h5" component="h2" gutterBottom>
-                            {editingId ? 'Edit Session' : 'Log Session'}
-                        </Typography>
+            <Dialog open={formDialogOpen} onClose={handleCancelEdit} maxWidth="sm" fullWidth>
+                <form onSubmit={handleSubmit}>
+                    <DialogTitle>{editingId ? 'Edit Session' : 'Log Session'}</DialogTitle>
+                    <DialogContent dividers>
                         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-                        <form onSubmit={handleSubmit}>
+                        <Box sx={{ mt: 1 }}>
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
@@ -282,40 +298,21 @@ const Journal = () => {
                                 placeholder="What went well? What needs work?"
                             />
 
-                            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                                {editingId && (
-                                    <Button
-                                        variant="outlined"
-                                        color="secondary"
-                                        fullWidth
-                                        size="large"
-                                        onClick={handleCancelEdit}
-                                        disabled={submitting}
-                                    >
-                                        Cancel
-                                    </Button>
-                                )}
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    color="primary"
-                                    fullWidth
-                                    size="large"
-                                    disabled={submitting}
-                                >
-                                    {submitting ? 'Saving...' : (editingId ? 'Update Entry' : 'Save Entry')}
-                                </Button>
-                            </Box>
-                        </form>
-                    </Paper>
-                </Grid>
+                        </Box>
+                    </DialogContent>
+                    <DialogActions sx={{ p: 2 }}>
+                        <Button onClick={handleCancelEdit} color="secondary" disabled={submitting}>
+                            Cancel
+                        </Button>
+                        <Button type="submit" variant="contained" color="primary" disabled={submitting}>
+                            {submitting ? 'Saving...' : (editingId ? 'Update Entry' : 'Save Entry')}
+                        </Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
 
-                {/* Journal Entries List */}
-                <Grid size={{ xs: 12, md: 7 }}>
-                    <Typography variant="h4" component="h1" gutterBottom>
-                        Training History
-                    </Typography>
-                    <Divider sx={{ mb: 3 }} />
+            {/* Journal Entries List */}
+            <Box>
 
                     {entries.length === 0 ? (
                         <Alert severity="info" variant="outlined">
@@ -381,8 +378,7 @@ const Journal = () => {
                             ))}
                         </List>
                     )}
-                </Grid>
-            </Grid>
+                </Box>
 
             {/* Delete Confirmation Dialog */}
             <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>

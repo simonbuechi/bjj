@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Home from './pages/Home';
+import Techniques from './pages/Techniques';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
@@ -17,6 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
+            <Route path="techniques" element={<Techniques />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="techniques/:id" element={<TechniqueDetails />} />

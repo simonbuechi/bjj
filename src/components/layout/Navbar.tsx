@@ -30,6 +30,7 @@ const Navbar = () => {
     };
 
     const pages = [
+        { title: 'Techniques', path: '/techniques' },
         { title: 'Journal', path: '/journal' },
         { title: 'Profile', path: '/profile' }
     ];
