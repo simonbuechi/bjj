@@ -24,13 +24,13 @@ const TechniqueCard = ({ technique }: TechniqueCardProps) => {
                     <Box
                         sx={{
                             height: 140,
-                            backgroundColor: 'action.disabledBackground',
+                            backgroundColor: 'primary.main',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
                         }}
                     >
-                        <Typography variant="body2" color="text.secondary">No Image</Typography>
+                        <Typography variant="body2" color="primary.contrastText">No Image</Typography>
                     </Box>
                 )}
                 <CardContent>

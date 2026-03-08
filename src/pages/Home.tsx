@@ -1,40 +1,65 @@
 import { useState, useEffect } from 'react';
-import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { ViewModule, ViewList, ChevronRight } from '@mui/icons-material';
+import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem, Fab, Tooltip } from '@mui/material';
+import { ViewModule, ViewList, ChevronRight, Add as AddIcon } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
-import { getTechniques } from '../services/db';
-import type { Technique, TechniqueType } from '../types';
+import { getTechniques, getUserProfile } from '../services/db';
+import type { Technique, TechniqueType, UserProfile } from '../types';
 import TechniqueCard from '../components/techniques/TechniqueCard';
+import { useAuth } from '../context/AuthContext';
 
 
 
 const Home = () => {
+    const { currentUser } = useAuth();
     const [techniques, setTechniques] = useState<Technique[]>([]);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [filter, setFilter] = useState<TechniqueType | 'all'>('all');
+    const [markerFilter, setMarkerFilter] = useState<'all' | 'favorite' | 'learning' | 'toLearn'>('all');
+    const [skillFilter, setSkillFilter] = useState<number | 'all'>('all');
 
-    const displayedTechniques = techniques.filter(
-        tech => filter === 'all' || tech.type === filter
-    );
+    const displayedTechniques = techniques.filter(tech => {
+        // filter by type
+        if (filter !== 'all' && tech.type !== filter) return false;
 
-    const fetchTechniques = async () => {
-        try {
-            setLoading(true);
-            const data = await getTechniques();
-            setTechniques(data);
-        } catch (err) {
-            console.error(err);
-            setError('Failed to load techniques.');
-        } finally {
-            setLoading(false);
+        // filter by marker (only if a profile is present and specifically filtering)
+        if (currentUser && profile && markerFilter !== 'all') {
+            const techStatus = profile.markedTechniques?.[tech.id];
+            if (!techStatus || !techStatus[markerFilter]) return false;
         }
-    };
+
+        // filter by skill level
+        if (currentUser && profile && skillFilter !== 'all') {
+            const techStatus = profile.markedTechniques?.[tech.id];
+            if (!techStatus || techStatus.skillLevel !== skillFilter) return false;
+        }
+
+        return true;
+    });
 
     useEffect(() => {
+        const fetchTechniques = async () => {
+            try {
+                setLoading(true);
+                const data = await getTechniques();
+                setTechniques(data);
+
+                if (currentUser) {
+                    const userProfile = await getUserProfile(currentUser.uid);
+                    setProfile(userProfile);
+                }
+            } catch (err) {
+                console.error(err);
+                setError('Failed to load techniques.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchTechniques();
-    }, []);
+    }, [currentUser]);
 
 
 
@@ -79,6 +104,45 @@ const Home = () => {
                                 <MenuItem value="frame" sx={{ textTransform: 'capitalize' }}>Frame</MenuItem>
                             </Select>
                         </FormControl>
+
+                        {currentUser && (
+                            <>
+                                <FormControl size="small" sx={{ minWidth: 150 }}>
+                                    <InputLabel id="marker-filter-label">Marker</InputLabel>
+                                    <Select
+                                        labelId="marker-filter-label"
+                                        id="marker-filter"
+                                        value={markerFilter}
+                                        label="Marker"
+                                        onChange={(e) => setMarkerFilter(e.target.value as 'all' | 'favorite' | 'learning' | 'toLearn')}
+                                        sx={{ textTransform: 'capitalize' }}
+                                    >
+                                        <MenuItem value="all">All</MenuItem>
+                                        <MenuItem value="favorite" sx={{ textTransform: 'capitalize' }}>Favorite</MenuItem>
+                                        <MenuItem value="learning" sx={{ textTransform: 'capitalize' }}>Learning</MenuItem>
+                                        <MenuItem value="toLearn" sx={{ textTransform: 'capitalize' }}>To Learn</MenuItem>
+                                    </Select>
+                                </FormControl>
+
+                                <FormControl size="small" sx={{ minWidth: 150 }}>
+                                    <InputLabel id="skill-filter-label">Skill Level</InputLabel>
+                                    <Select
+                                        labelId="skill-filter-label"
+                                        id="skill-filter"
+                                        value={skillFilter}
+                                        label="Skill Level"
+                                        onChange={(e) => setSkillFilter(e.target.value as number | 'all')}
+                                    >
+                                        <MenuItem value="all">All levels</MenuItem>
+                                        <MenuItem value={1}>1 Star</MenuItem>
+                                        <MenuItem value={2}>2 Stars</MenuItem>
+                                        <MenuItem value={3}>3 Stars</MenuItem>
+                                        <MenuItem value={4}>4 Stars</MenuItem>
+                                        <MenuItem value={5}>5 Stars</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </>
+                        )}
 
                         <ToggleButtonGroup
                             value={viewMode}
@@ -158,6 +222,20 @@ const Home = () => {
                         ))}
                     </List>
                 </Paper>
+            )}
+
+            {currentUser && (
+                <Tooltip title="Add New Technique" placement="left">
+                    <Fab
+                        color="primary"
+                        aria-label="add technique"
+                        component={RouterLink}
+                        to="/techniques/new"
+                        sx={{ position: 'fixed', bottom: 32, right: 32 }}
+                    >
+                        <AddIcon />
+                    </Fab>
+                </Tooltip>
             )}
         </Container>
     );
