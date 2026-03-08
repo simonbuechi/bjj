@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import {
     Typography, Box, Container, Paper, TextField,
-    Button, CircularProgress, Alert, Grid, Divider,
-    List, Chip, Autocomplete, MenuItem, FormControlLabel, Switch, Rating
+    Button, CircularProgress, Alert, Grid, Divider, IconButton,
+    List, Chip, Autocomplete, MenuItem, FormControlLabel, Switch, Rating,
+    Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions
 } from '@mui/material';
+import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
-import { getJournalEntries, createJournalEntry, getTechniques } from '../services/db';
+import { getJournalEntries, createJournalEntry, updateJournalEntry, deleteJournalEntry, getTechniques } from '../services/db';
 import type { JournalEntry, Technique, SessionType } from '../types';
 
 const SESSION_TYPES: SessionType[] = ['Regular class', 'Private class', 'Open mat', 'Seminar', 'Camp', 'Competition'];
@@ -29,6 +31,11 @@ const Journal = () => {
     const [comment, setComment] = useState('');
     const [selectedTechniques, setSelectedTechniques] = useState<Technique[]>([]);
     const [submitting, setSubmitting] = useState(false);
+
+    // Edit and Delete state
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -60,7 +67,7 @@ const Journal = () => {
             setSubmitting(true);
             setError('');
 
-            const newEntryData = {
+            const entryData = {
                 date,
                 time,
                 isGi,
@@ -71,24 +78,81 @@ const Journal = () => {
                 techniqueIds: selectedTechniques.map(t => t.id)
             };
 
-            const newId = await createJournalEntry(currentUser.uid, newEntryData);
-
-            // Update local state
-            setEntries(prev => [{ id: newId, userId: currentUser.uid, ...newEntryData }, ...prev]);
+            if (editingId) {
+                await updateJournalEntry(currentUser.uid, editingId, entryData);
+                setEntries(prev => prev.map(entry =>
+                    entry.id === editingId ? { ...entry, ...entryData } : entry
+                ));
+            } else {
+                const newId = await createJournalEntry(currentUser.uid, entryData);
+                setEntries(prev => [{ id: newId, userId: currentUser.uid, ...entryData }, ...prev]);
+            }
 
             // Reset form
-            setComment('');
-            setSelectedTechniques([]);
-            setLength(90);
-            setIntensity(3);
-            setIsGi(true);
-            setSessionType('Regular class');
+            handleCancelEdit();
 
         } catch (err) {
             console.error(err);
-            setError('Failed to save journal entry');
+            setError(editingId ? 'Failed to update journal entry' : 'Failed to save journal entry');
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleEditClick = (entry: JournalEntry) => {
+        setEditingId(entry.id);
+        setDate(entry.date);
+        setTime(entry.time || '');
+        setIsGi(entry.isGi !== false);
+        setLength(entry.length || '');
+        setSessionType(entry.sessionType || 'Regular class');
+        setIntensity(entry.intensity || null);
+        setComment(entry.comment || '');
+
+        if (entry.techniqueIds && entry.techniqueIds.length > 0) {
+            const techs = entry.techniqueIds
+                .map(id => allTechniques.find(t => t.id === id))
+                .filter((t): t is Technique => t !== undefined);
+            setSelectedTechniques(techs);
+        } else {
+            setSelectedTechniques([]);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setDate(new Date().toISOString().split('T')[0]);
+        setTime('');
+        setComment('');
+        setSelectedTechniques([]);
+        setLength(90);
+        setIntensity(3);
+        setIsGi(true);
+        setSessionType('Regular class');
+        setError('');
+    };
+
+    const handleDeleteClick = (id: string) => {
+        setEntryToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!currentUser || !entryToDelete) return;
+
+        try {
+            await deleteJournalEntry(currentUser.uid, entryToDelete);
+            setEntries(prev => prev.filter(entry => entry.id !== entryToDelete));
+            setDeleteDialogOpen(false);
+            setEntryToDelete(null);
+
+            // If the deleted entry was being edited, cancel the edit
+            if (editingId === entryToDelete) {
+                handleCancelEdit();
+            }
+        } catch (err) {
+            console.error(err);
+            setError('Failed to delete journal entry');
         }
     };
 
@@ -108,7 +172,7 @@ const Journal = () => {
                 <Grid size={{ xs: 12, md: 5 }}>
                     <Paper elevation={3} sx={{ p: 3, borderRadius: 2, position: 'sticky', top: 24 }}>
                         <Typography variant="h5" component="h2" gutterBottom>
-                            Log Session
+                            {editingId ? 'Edit Session' : 'Log Session'}
                         </Typography>
                         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
@@ -218,17 +282,30 @@ const Journal = () => {
                                 placeholder="What went well? What needs work?"
                             />
 
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                color="primary"
-                                fullWidth
-                                size="large"
-                                disabled={submitting}
-                                sx={{ mt: 2 }}
-                            >
-                                {submitting ? 'Saving...' : 'Save Entry'}
-                            </Button>
+                            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                                {editingId && (
+                                    <Button
+                                        variant="outlined"
+                                        color="secondary"
+                                        fullWidth
+                                        size="large"
+                                        onClick={handleCancelEdit}
+                                        disabled={submitting}
+                                    >
+                                        Cancel
+                                    </Button>
+                                )}
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
+                                    fullWidth
+                                    size="large"
+                                    disabled={submitting}
+                                >
+                                    {submitting ? 'Saving...' : (editingId ? 'Update Entry' : 'Save Entry')}
+                                </Button>
+                            </Box>
                         </form>
                     </Paper>
                 </Grid>
@@ -253,6 +330,14 @@ const Journal = () => {
                                             {new Date(entry.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
                                             {entry.time && ` • ${entry.time}`}
                                         </Typography>
+                                        <Box>
+                                            <IconButton size="small" onClick={() => handleEditClick(entry)} color="primary">
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                            <IconButton size="small" onClick={() => handleDeleteClick(entry.id)} color="error">
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </Box>
                                     </Box>
 
                                     <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
@@ -298,6 +383,22 @@ const Journal = () => {
                     )}
                 </Grid>
             </Grid>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+                <DialogTitle>Delete Journal Entry</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this training session? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={confirmDelete} color="error" variant="contained">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 };

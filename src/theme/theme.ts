@@ -7,16 +7,16 @@ import { createTheme, type PaletteMode } from '@mui/material/styles';
 
 export const THEME_COLORS = {
     light: {
-        primary: '#2563EB',    // Vibrant Blue
-        secondary: '#F59E0B',  // Amber/Warm Orange
-        background: '#FAF9F6', // Soft Off-white
+        primary: '#22799eff',    // Vibrant Blue
+        secondary: '#f58f00ff',  // Amber/Warm Orange
+        background: '#eaf6fbff', // Soft Off-white
         paper: '#FFFFFF',
     },
     dark: {
-        primary: '#60A5FA',    // Light Blue
-        secondary: '#FBBF24',  // Light Amber
+        primary: '#2e9fd0ff',    // Light Blue
+        secondary: '#f58f00ff',  // Light Amber
         background: '#0F172A', // Slate Dark
-        paper: '#1E293B',      // Slate Slightly Lighter
+        paper: '#274862ff',      // Slate Slightly Lighter
     }
 };
 

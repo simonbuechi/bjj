@@ -10,7 +10,13 @@ export interface Technique {
 }
 
 export type BeltColor = 'white' | 'blue' | 'purple' | 'brown' | 'black';
-export type MarkedStatus = 'favorite' | 'currently learning' | 'to learn' | 'error prone';
+
+export interface MarkedStatus {
+    favorite?: boolean;
+    learning?: boolean;
+    toLearn?: boolean;
+    skillLevel?: number; // 1-5
+}
 
 export interface UserProfile {
     uid: string;

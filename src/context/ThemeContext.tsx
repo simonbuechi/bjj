@@ -20,8 +20,8 @@ export const useAppTheme = () => {
 };
 
 export const CustomThemeProvider = ({ children }: { children: ReactNode }) => {
-    // Option to base default on system preference, but user requested 'dark' default
-    const [mode, setMode] = useState<ThemeMode>('dark');
+    // Option to base default on system preference, but user requested 'light' default
+    const [mode, setMode] = useState<ThemeMode>('light');
 
     const toggleColorMode = () => {
         setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));

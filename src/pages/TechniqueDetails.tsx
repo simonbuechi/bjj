@@ -1,27 +1,25 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useParams, Link as RouterLink } from 'react-router-dom';
 import {
     Typography, Box, CircularProgress, Container,
-    Chip, Grid, Paper, Divider, Button, ToggleButtonGroup, ToggleButton,
-    Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions
+    Chip, Grid, Paper, Divider, Button, ToggleButton,
+    List, ListItem, ListItemText, ListItemIcon, Rating
 } from '@mui/material';
-import { Favorite, MenuBook, ErrorOutline, School, Delete } from '@mui/icons-material';
-import { getTechniqueById, getUserProfile, updateUserProfile, deleteTechnique } from '../services/db';
-import type { Technique, UserProfile, MarkedStatus } from '../types';
+import { Favorite, MenuBook, School, EventNote } from '@mui/icons-material';
+import { getTechniqueById, getUserProfile, updateUserProfile, getJournalEntries } from '../services/db';
+import type { Technique, UserProfile, MarkedStatus, JournalEntry } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 const TechniqueDetails = () => {
     const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
     const { currentUser } = useAuth();
 
     const [technique, setTechnique] = useState<Technique | null>(null);
     const [connected, setConnected] = useState<Technique[]>([]);
     const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [sessions, setSessions] = useState<JournalEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,6 +42,12 @@ const TechniqueDetails = () => {
                 if (currentUser) {
                     const userProf = await getUserProfile(currentUser.uid);
                     setProfile(userProf);
+
+                    const allEntries = await getJournalEntries(currentUser.uid);
+                    const techniqueSessions = allEntries.filter(entry =>
+                        entry.techniqueIds && entry.techniqueIds.includes(id)
+                    );
+                    setSessions(techniqueSessions);
                 }
             } catch (err) {
                 console.error(err);
@@ -56,48 +60,69 @@ const TechniqueDetails = () => {
         fetchData();
     }, [id, currentUser]);
 
-    const handleMarkChange = async (_event: React.MouseEvent<HTMLElement>, newStatus: MarkedStatus | null) => {
-        if (!currentUser || !id) return;
+    const handleStatusToggle = async (key: keyof Omit<MarkedStatus, 'skillLevel'>) => {
+        if (!currentUser || !id || !profile) return;
 
         try {
-            // Optimistic update
-            const updatedProfile = { ...profile } as UserProfile;
+            const currentTechniqueStatus = profile.markedTechniques?.[id] || {};
+            const newValue = !currentTechniqueStatus[key];
+
+            const updatedStatus = { ...currentTechniqueStatus, [key]: newValue };
+
+            // Clean up if all properties are false/undefined
+            const isEmtpy = !updatedStatus.favorite && !updatedStatus.learning && !updatedStatus.toLearn && !updatedStatus.skillLevel;
+
+            const updatedProfile = { ...profile };
             if (!updatedProfile.markedTechniques) {
                 updatedProfile.markedTechniques = {};
             }
 
-            if (newStatus === null) {
+            if (isEmtpy) {
                 delete updatedProfile.markedTechniques[id];
             } else {
-                updatedProfile.markedTechniques[id] = newStatus;
+                updatedProfile.markedTechniques[id] = updatedStatus;
             }
 
             setProfile(updatedProfile);
             await updateUserProfile(currentUser.uid, { markedTechniques: updatedProfile.markedTechniques });
         } catch (err) {
             console.error("Failed to update status", err);
-            // Rollback is missing here for simplicity but could be added
         }
     };
 
-    const handleDelete = async () => {
-        if (!id) return;
+    const handleRatingChange = async (_event: React.SyntheticEvent, newValue: number | null) => {
+        if (!currentUser || !id || !profile) return;
+
         try {
-            setDeleting(true);
-            await deleteTechnique(id);
-            navigate('/');
+            const currentTechniqueStatus = profile.markedTechniques?.[id] || {};
+
+            const updatedStatus = { ...currentTechniqueStatus, skillLevel: newValue === null ? undefined : newValue };
+
+            const isEmtpy = !updatedStatus.favorite && !updatedStatus.learning && !updatedStatus.toLearn && !updatedStatus.skillLevel;
+
+            const updatedProfile = { ...profile };
+            if (!updatedProfile.markedTechniques) {
+                updatedProfile.markedTechniques = {};
+            }
+
+            if (isEmtpy) {
+                delete updatedProfile.markedTechniques[id];
+            } else {
+                updatedProfile.markedTechniques[id] = updatedStatus;
+            }
+
+            setProfile(updatedProfile);
+            await updateUserProfile(currentUser.uid, { markedTechniques: updatedProfile.markedTechniques });
         } catch (err) {
-            console.error("Failed to delete technique", err);
-            setError("Failed to delete technique. Please try again.");
-            setDeleteDialogOpen(false);
-            setDeleting(false);
+            console.error("Failed to update rating", err);
         }
     };
+
 
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}><CircularProgress /></Box>;
     if (error || !technique) return <Container><Typography color="error" mt={4}>{error || 'Not found'}</Typography></Container>;
 
-    const currentStatus = profile?.markedTechniques?.[technique.id] || null;
+    const currentStatus = profile?.markedTechniques?.[technique.id] || {};
 
     return (
         <Container maxWidth="lg">
@@ -117,25 +142,15 @@ const TechniqueDetails = () => {
                                 />
                             </Box>
                             {currentUser && (
-                                <Box display="flex" gap={1}>
-                                    <Button
-                                        component={RouterLink}
-                                        to={`/techniques/${technique.id}/edit`}
-                                        variant="outlined"
-                                        color="primary"
-                                        size="small"
-                                    >
-                                        Edit
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        color="error"
-                                        size="small"
-                                        onClick={() => setDeleteDialogOpen(true)}
-                                    >
-                                        <Delete fontSize="small" />
-                                    </Button>
-                                </Box>
+                                <Button
+                                    component={RouterLink}
+                                    to={`/techniques/${technique.id}/edit`}
+                                    variant="outlined"
+                                    color="primary"
+                                    size="small"
+                                >
+                                    Edit
+                                </Button>
                             )}
                         </Box>
 
@@ -176,68 +191,107 @@ const TechniqueDetails = () => {
                     </Grid>
 
                     <Grid size={{ xs: 12, md: 4 }}>
-                        <Paper variant="outlined" sx={{ p: 3, position: 'sticky', top: 24 }}>
-                            <Typography variant="h6" gutterBottom>My Progress</Typography>
-                            <Divider sx={{ mb: 3 }} />
+                        <Box sx={{ position: 'sticky', top: 24, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                            <Paper variant="outlined" sx={{ p: 3 }}>
+                                <Typography variant="h6" gutterBottom>My Progress</Typography>
+                                <Divider sx={{ mb: 3 }} />
 
-                            {!currentUser ? (
-                                <Box>
-                                    <Typography variant="body2" color="text.secondary" mb={2}>
-                                        Log in to mark this technique and track your progress.
-                                    </Typography>
-                                    <Button variant="outlined" fullWidth component={RouterLink} to="/login">
-                                        Log In
-                                    </Button>
-                                </Box>
-                            ) : (
-                                <Box>
-                                    <Typography variant="subtitle2" gutterBottom>Status Marker</Typography>
-                                    <ToggleButtonGroup
-                                        orientation="vertical"
-                                        value={currentStatus}
-                                        exclusive
-                                        onChange={handleMarkChange}
-                                        fullWidth
-                                        size="small"
-                                    >
-                                        <ToggleButton value="favorite" aria-label="favorite">
+                                {!currentUser ? (
+                                    <Box>
+                                        <Typography variant="body2" color="text.secondary" mb={2}>
+                                            Log in to mark this technique and track your progress.
+                                        </Typography>
+                                        <Button variant="outlined" fullWidth component={RouterLink} to="/login">
+                                            Log In
+                                        </Button>
+                                    </Box>
+                                ) : (
+                                    <Box display="flex" flexDirection="column" gap={1.5}>
+                                        <Typography variant="subtitle2" gutterBottom>Status Marker</Typography>
+                                        <ToggleButton
+                                            value="favorite"
+                                            selected={!!currentStatus.favorite}
+                                            onChange={() => handleStatusToggle('favorite')}
+                                            fullWidth
+                                            size="small"
+                                            color="primary"
+                                        >
                                             <Favorite sx={{ mr: 1, fontSize: 20 }} /> Favorite
                                         </ToggleButton>
-                                        <ToggleButton value="currently learning" aria-label="learning">
+                                        <ToggleButton
+                                            value="learning"
+                                            selected={!!currentStatus.learning}
+                                            onChange={() => handleStatusToggle('learning')}
+                                            fullWidth
+                                            size="small"
+                                            color="primary"
+                                        >
                                             <School sx={{ mr: 1, fontSize: 20 }} /> Currently Learning
                                         </ToggleButton>
-                                        <ToggleButton value="to learn" aria-label="to learn">
+                                        <ToggleButton
+                                            value="toLearn"
+                                            selected={!!currentStatus.toLearn}
+                                            onChange={() => handleStatusToggle('toLearn')}
+                                            fullWidth
+                                            size="small"
+                                            color="primary"
+                                        >
                                             <MenuBook sx={{ mr: 1, fontSize: 20 }} /> To Learn
                                         </ToggleButton>
-                                        <ToggleButton value="error prone" aria-label="error prone">
-                                            <ErrorOutline sx={{ mr: 1, fontSize: 20 }} /> Error Prone
-                                        </ToggleButton>
-                                    </ToggleButtonGroup>
-                                </Box>
+
+                                        <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>Skill Level</Typography>
+                                        <Box display="flex" justifyContent="center">
+                                            <Rating
+                                                name="technique-skill-level"
+                                                value={currentStatus.skillLevel || 0}
+                                                onChange={handleRatingChange}
+                                                size="large"
+                                            />
+                                        </Box>
+                                    </Box>
+                                )}
+                            </Paper>
+
+                            {currentUser && sessions.length > 0 && (
+                                <Paper variant="outlined" sx={{ p: 3 }}>
+                                    <Typography variant="h6" gutterBottom>Training History</Typography>
+                                    <Divider sx={{ mb: 2 }} />
+                                    <List disablePadding>
+                                        {sessions.map(session => (
+                                            <ListItem key={session.id} disablePadding sx={{ mb: 1, alignItems: 'flex-start' }}>
+                                                <ListItemIcon sx={{ minWidth: 36, mt: 0.5 }}>
+                                                    <EventNote fontSize="small" color="primary" />
+                                                </ListItemIcon>
+                                                <ListItemText
+                                                    primary={new Date(session.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+                                                    secondary={
+                                                        <>
+                                                            {session.sessionType || 'Training Session'}
+                                                            {session.length ? ` • ${session.length} min` : ''}
+                                                        </>
+                                                    }
+                                                    secondaryTypographyProps={{ variant: 'caption', display: 'block' }}
+                                                />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                    <Button
+                                        component={RouterLink}
+                                        to="/journal"
+                                        variant="text"
+                                        fullWidth
+                                        size="small"
+                                        sx={{ mt: 1 }}
+                                    >
+                                        View Full Journal
+                                    </Button>
+                                </Paper>
                             )}
-                        </Paper>
+                        </Box>
                     </Grid>
                 </Grid>
             </Paper>
-
-            <Dialog
-                open={deleteDialogOpen}
-                onClose={() => setDeleteDialogOpen(false)}
-            >
-                <DialogTitle>Delete Technique?</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Are you sure you want to delete "{technique.name}"? This action cannot be undone.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>Cancel</Button>
-                    <Button onClick={handleDelete} color="error" variant="contained" disabled={deleting}>
-                        {deleting ? 'Deleting...' : 'Delete'}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </Container>
+        </Container >
     );
 };
 
