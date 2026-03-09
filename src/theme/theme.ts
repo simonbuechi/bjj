@@ -35,6 +35,7 @@ export const getAppTheme = (mode: PaletteMode) => createTheme({
         },
     },
     typography: {
+        fontSize: 12, // Default is 14px. Adjust this to globally change font size.
         fontFamily: '"Poppins", "Inter", "Roboto", "Segoe UI", sans-serif',
         h1: {
             fontWeight: 700,
