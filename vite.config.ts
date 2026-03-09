@@ -18,7 +18,7 @@ export default defineConfig({
         background_color: '#2e9fd0',
         display: 'fullscreen',
         orientation: 'portrait',
-        start_url: '.',
+        start_url: '/bjj/',
         lang: 'en-US',
         dir: 'ltr',
         categories: ['sports', 'health', 'fitness'],

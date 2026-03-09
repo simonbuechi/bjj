@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem, Fab, Tooltip, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
-import { ViewModule, ViewList, ChevronRight, Add as AddIcon, FilterList, ExpandMore } from '@mui/icons-material';
+import { ViewModule, ViewList, ChevronRight, Add as AddIcon, FilterList, ExpandMore, PlayCircleOutline, Link as LinkIcon, Favorite, School, MenuBook, Star, StarBorder } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { getTechniques, getUserProfile } from '../services/db';
 import type { Technique, TechniqueType, UserProfile } from '../types';
@@ -207,7 +207,7 @@ const Home = () => {
                 <Grid container spacing={3}>
                     {displayedTechniques.map((technique) => (
                         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={technique.id}>
-                            <TechniqueCard technique={technique} />
+                            <TechniqueCard technique={technique} userProfile={profile} />
                         </Grid>
                     ))}
                 </Grid>
@@ -229,26 +229,63 @@ const Home = () => {
                             >
                                 <ListItemText
                                     primary={
-                                        <Typography variant="h6" component="div">
-                                            {technique.name}
-                                        </Typography>
-                                    }
-                                    secondary={
-                                        <Typography variant="body2" color="text.secondary" noWrap sx={{ mt: 1 }}>
-                                            {technique.description}
-                                        </Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                            <Typography variant="h6" component="div">
+                                                {technique.name}
+                                            </Typography>
+                                            <Chip
+                                                label={technique.type}
+                                                size="small"
+                                                color="primary"
+                                                variant="outlined"
+                                                sx={{ textTransform: 'capitalize' }}
+                                            />
+                                            {technique.videos && technique.videos.length > 0 && (
+                                                <Tooltip title="Has Video">
+                                                    <PlayCircleOutline color="primary" fontSize="small" />
+                                                </Tooltip>
+                                            )}
+                                            {technique.resources && technique.resources.length > 0 && (
+                                                <Tooltip title="Has External Link">
+                                                    <LinkIcon color="primary" fontSize="small" />
+                                                </Tooltip>
+                                            )}
+                                            {profile?.markedTechniques?.[technique.id] && (
+                                                <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 0.5 }}>
+                                                    {profile.markedTechniques[technique.id].favorite && (
+                                                        <Tooltip title="Favorite">
+                                                            <Favorite color="error" fontSize="small" />
+                                                        </Tooltip>
+                                                    )}
+                                                    {profile.markedTechniques[technique.id].learning && (
+                                                        <Tooltip title="Currently Learning">
+                                                            <School color="primary" fontSize="small" />
+                                                        </Tooltip>
+                                                    )}
+                                                    {profile.markedTechniques[technique.id].toLearn && (
+                                                        <Tooltip title="To Learn">
+                                                            <MenuBook color="secondary" fontSize="small" />
+                                                        </Tooltip>
+                                                    )}
+                                                    {profile.markedTechniques[technique.id].skillLevel !== undefined && (
+                                                        <Tooltip title={`Skill Level: ${profile.markedTechniques[technique.id].skillLevel}`}>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', ml: 0.5 }}>
+                                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                                    star <= (profile.markedTechniques[technique.id].skillLevel || 0) ? (
+                                                                        <Star key={star} sx={{ color: 'gold', fontSize: '1rem' }} />
+                                                                    ) : (
+                                                                        <StarBorder key={star} sx={{ color: 'action.disabled', fontSize: '1rem' }} />
+                                                                    )
+                                                                ))}
+                                                            </Box>
+                                                        </Tooltip>
+                                                    )}
+                                                </Box>
+                                            )}
+                                        </Box>
                                     }
                                 />
-                                <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, gap: 2 }}>
-                                    <Chip
-                                        label={technique.type}
-                                        size="small"
-                                        color="primary"
-                                        variant="outlined"
-                                        sx={{ textTransform: 'capitalize', display: { xs: 'none', sm: 'flex' } }}
-                                    />
-                                    <ChevronRight color="action" />
-                                </Box>
+                                <ChevronRight color="action" />
                             </ListItem>
                         ))}
                     </List>
