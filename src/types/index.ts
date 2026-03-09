@@ -6,6 +6,8 @@ export interface Technique {
     description: string;
     type: TechniqueType;
     images: string[];
+    videos?: string[];
+    resources?: string[];
     connectedTechniques: string[]; // IDs of techniques this can lead to
 }
 

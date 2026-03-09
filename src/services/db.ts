@@ -1,6 +1,32 @@
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, addDoc, query, orderBy, deleteDoc } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { db, storage } from '../firebase/config';
 import type { Technique, UserProfile, JournalEntry } from '../types';
+
+export const uploadImage = async (file: File, path: string): Promise<string> => {
+    const storageRef = ref(storage, path);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
+};
+
+export const deleteImage = async (url: string): Promise<void> => {
+    try {
+        // Extract the path from the download URL
+        // Firebase storage URLs look like: https://firebasestorage.googleapis.com/v0/b/bucket-name/o/path%2Fto%2Ffile?alt=media...
+        const decodedUrl = decodeURIComponent(url);
+        const startIndex = decodedUrl.indexOf('/o/') + 3;
+        const endIndex = decodedUrl.indexOf('?');
+
+        if (startIndex > 2 && endIndex > startIndex) {
+            const filePath = decodedUrl.substring(startIndex, endIndex);
+            const storageRef = ref(storage, filePath);
+            await deleteObject(storageRef);
+        }
+    } catch (error) {
+        console.error("Error deleting image from storage:", error);
+        // We don't necessarily want this to block technique deletion if the image is already gone
+    }
+};
 
 // Techniques
 export const getTechniques = async (): Promise<Technique[]> => {
@@ -28,8 +54,21 @@ export const updateTechnique = async (id: string, data: Partial<Technique>): Pro
 };
 
 export const deleteTechnique = async (id: string): Promise<void> => {
+    // 1. Fetch the technique first to get image URLs
+    const tech = await getTechniqueById(id);
+
+    // 2. Delete the document from Firestore
     const docRef = doc(db, 'techniques', id);
     await deleteDoc(docRef);
+
+    // 3. Delete associated images from Storage
+    if (tech && tech.images && tech.images.length > 0) {
+        for (const url of tech.images) {
+            if (url.includes('firebasestorage')) {
+                await deleteImage(url);
+            }
+        }
+    }
 };
 
 // User Profiles

@@ -5,7 +5,7 @@ import {
     Chip, Grid, Paper, Divider, Button, ToggleButton,
     List, ListItem, ListItemText, ListItemIcon, Rating
 } from '@mui/material';
-import { Favorite, MenuBook, School, EventNote } from '@mui/icons-material';
+import { Favorite, MenuBook, School, EventNote, ArrowBack } from '@mui/icons-material';
 import { getTechniqueById, getUserProfile, updateUserProfile, getJournalEntries } from '../services/db';
 import type { Technique, UserProfile, MarkedStatus, JournalEntry } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -131,6 +131,14 @@ const TechniqueDetails = () => {
                     <Grid size={{ xs: 12, md: 8 }}>
                         <Box mb={2} display="flex" justifyContent="space-between" alignItems="flex-start">
                             <Box>
+                                <Button
+                                    component={RouterLink}
+                                    to="/techniques"
+                                    startIcon={<ArrowBack />}
+                                    sx={{ mb: 1, color: 'text.secondary' }}
+                                >
+                                    Back to Overview
+                                </Button>
                                 <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
                                     {technique.name}
                                 </Typography>
@@ -168,6 +176,61 @@ const TechniqueDetails = () => {
                         <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
                             {technique.description}
                         </Typography>
+
+                        {technique.videos && technique.videos.length > 0 && (
+                            <Box mt={4}>
+                                <Typography variant="h5" gutterBottom>Videos</Typography>
+                                <Divider sx={{ mb: 2 }} />
+                                <Grid container spacing={2}>
+                                    {technique.videos.map((vid, index) => {
+                                        // Simple check to try and embed youtube, otherwise just a link
+                                        const isYoutube = vid.includes('youtube.com/watch') || vid.includes('youtu.be/');
+                                        if (isYoutube) {
+                                            const videoId = vid.includes('youtube.com')
+                                                ? new URL(vid).searchParams.get('v')
+                                                : vid.split('youtu.be/')[1]?.split('?')[0];
+
+                                            return (
+                                                <Grid size={{ xs: 12, sm: 6 }} key={index}>
+                                                    <Box sx={{ position: 'relative', paddingTop: '56.25%', width: '100%', borderRadius: 2, overflow: 'hidden' }}>
+                                                        <iframe
+                                                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                                                            src={`https://www.youtube.com/embed/${videoId}`}
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                            allowFullScreen
+                                                            title={`Video ${index + 1}`}
+                                                        />
+                                                    </Box>
+                                                </Grid>
+                                            );
+                                        }
+                                        return (
+                                            <Grid size={{ xs: 12 }} key={index}>
+                                                <Button href={vid} target="_blank" rel="noopener noreferrer" variant="outlined" sx={{ justifyContent: 'flex-start', textTransform: 'none' }} fullWidth>
+                                                    {vid}
+                                                </Button>
+                                            </Grid>
+                                        );
+                                    })}
+                                </Grid>
+                            </Box>
+                        )}
+
+                        {technique.resources && technique.resources.length > 0 && (
+                            <Box mt={4}>
+                                <Typography variant="h5" gutterBottom>Resources</Typography>
+                                <Divider sx={{ mb: 2 }} />
+                                <List disablePadding>
+                                    {technique.resources.map((res, index) => (
+                                        <ListItem key={index} disablePadding sx={{ mb: 1 }}>
+                                            <Button href={res} target="_blank" rel="noopener noreferrer" variant="text" sx={{ justifyContent: 'flex-start', textTransform: 'none', textAlign: 'left' }} fullWidth>
+                                                {res}
+                                            </Button>
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Box>
+                        )}
 
                         {connected.length > 0 && (
                             <Box mt={6}>

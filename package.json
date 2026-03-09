@@ -1,5 +1,5 @@
 {
-  "name": "BJJ Amigo",
+  "name": "bjj-amigo",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -17,6 +17,7 @@
     "@fontsource/poppins": "^5.2.7",
     "@mui/icons-material": "^7.3.9",
     "@mui/material": "^7.3.9",
+    "browser-image-compression": "^2.0.2",
     "firebase": "^12.10.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
