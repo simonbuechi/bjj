@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     Typography, Box, Container, Paper, TextField,
-    Button, CircularProgress, Alert, Grid, MenuItem, Autocomplete, IconButton
+    Button, CircularProgress, Alert, Grid, MenuItem, Autocomplete
 } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
 import imageCompression from 'browser-image-compression';

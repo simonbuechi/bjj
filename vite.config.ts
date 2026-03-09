@@ -13,8 +13,8 @@ export default defineConfig({
         name: 'BJJ Amigo',
         short_name: 'BJJ',
         description: 'A journal and technique tracker for Brazilian Jiu-Jitsu.',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        theme_color: '#2e9fd0',
+        background_color: '#2e9fd0',
         display: 'standalone',
         icons: [
           {

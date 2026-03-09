@@ -6,8 +6,8 @@ import {
     List, ListItem, ListItemText, Divider,
     Dialog, DialogTitle, DialogContent, DialogActions, IconButton
 } from '@mui/material';
-import { Favorite, School, MenuBook, Close, Edit } from '@mui/icons-material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Favorite, School, MenuBook, Close, Edit, Logout } from '@mui/icons-material';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserProfile, updateUserProfile, createUserProfile, getTechniques } from '../services/db';
 import type { UserProfile, BeltColor, Technique } from '../types';
@@ -16,7 +16,7 @@ const BELTS: BeltColor[] = ['white', 'blue', 'purple', 'brown', 'black'];
 const STRIPES = [1, 2, 3, 4, 5];
 
 const Profile = () => {
-    const { currentUser } = useAuth();
+    const { currentUser, logout } = useAuth();
     const [profile, setProfile] = useState<Partial<UserProfile>>({
         name: '',
         birthYear: undefined,
@@ -82,7 +82,19 @@ const Profile = () => {
         setProfile({ ...profile, [field]: value });
     };
 
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate('/login');
+        } catch (error) {
+            console.error("Failed to log out", error);
+        }
+    };
+
     const handleSave = async (e: React.FormEvent) => {
+        // ... (existing handleSave)
         e.preventDefault();
         if (!currentUser) return;
 
@@ -184,6 +196,22 @@ const Profile = () => {
                                             {profile.notes}
                                         </Typography>
                                     </Paper>
+                                </Grid>
+                            )}
+
+                            {currentUser && (
+                                <Grid size={{ xs: 12 }}>
+                                    <Box mt={2}>
+                                        <Button
+                                            variant="outlined"
+                                            color="error"
+                                            onClick={handleLogout}
+                                            startIcon={<Logout />}
+                                            fullWidth
+                                        >
+                                            Logout
+                                        </Button>
+                                    </Box>
                                 </Grid>
                             )}
                         </Grid>
