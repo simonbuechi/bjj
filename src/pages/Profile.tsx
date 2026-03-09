@@ -3,9 +3,10 @@ import {
     Typography, Box, Container, Paper, TextField,
     Button, MenuItem, CircularProgress, Alert, Grid,
     FormControlLabel, Checkbox, FormGroup, FormLabel,
-    List, ListItem, ListItemText, Divider
+    List, ListItem, ListItemText, Divider,
+    Dialog, DialogTitle, DialogContent, DialogActions, IconButton
 } from '@mui/material';
-import { Favorite, School, MenuBook } from '@mui/icons-material';
+import { Favorite, School, MenuBook, Close, Edit } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserProfile, updateUserProfile, createUserProfile, getTechniques } from '../services/db';
@@ -34,6 +35,7 @@ const Profile = () => {
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -97,6 +99,7 @@ const Profile = () => {
             }
 
             setMessage('Profile updated successfully');
+            setIsEditDialogOpen(false);
         } catch (err) {
             console.error(err);
             setError('Failed to update profile');
@@ -128,140 +131,220 @@ const Profile = () => {
                             <Typography variant="h4" component="h1">
                                 Your profile
                             </Typography>
+                            <Button
+                                variant="outlined"
+                                startIcon={<Edit />}
+                                onClick={() => setIsEditDialogOpen(true)}
+                                sx={{ borderRadius: 8 }}
+                            >
+                                Edit Profile
+                            </Button>
                         </Box>
 
                         {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
                         {message && <Alert severity="success" sx={{ mb: 3 }}>{message}</Alert>}
 
-                        <form onSubmit={handleSave}>
-                            <Grid container spacing={3}>
-                                <Grid size={{ xs: 12 }}>
-                                    <TextField
-                                        label="Name"
-                                        fullWidth
-                                        value={profile.name || ''}
-                                        onChange={handleChange('name')}
-                                        required
-                                    />
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}>
-                                    <TextField
-                                        select
-                                        label="Belt"
-                                        fullWidth
-                                        value={profile.belt || 'white'}
-                                        onChange={handleChange('belt')}
-                                        sx={{ textTransform: 'capitalize' }}
-                                    >
-                                        {BELTS.map((belt) => (
-                                            <MenuItem key={belt} value={belt} sx={{ textTransform: 'capitalize' }}>
-                                                {belt}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}>
-                                    <TextField
-                                        select
-                                        label="Stripes"
-                                        fullWidth
-                                        value={profile.stripes || 1}
-                                        onChange={handleChange('stripes')}
-                                    >
-                                        {STRIPES.map((stripe) => (
-                                            <MenuItem key={stripe} value={stripe}>
-                                                {stripe}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 4 }}>
-                                    <TextField
-                                        label="Birth Year"
-                                        type="number"
-                                        fullWidth
-                                        value={profile.birthYear || ''}
-                                        onChange={handleChange('birthYear')}
-                                        inputProps={{ min: 1900, max: new Date().getFullYear() }}
-                                    />
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 4 }}>
-                                    <TextField
-                                        label="BJJ Experience (Years)"
-                                        type="number"
-                                        fullWidth
-                                        value={profile.bjjExperience || ''}
-                                        onChange={handleChange('bjjExperience')}
-                                        inputProps={{ min: 0, step: 0.5 }}
-                                    />
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 4 }}>
-                                    <TextField
-                                        select
-                                        label="Trainings Per Week"
-                                        fullWidth
-                                        value={profile.trainingsPerWeek || ''}
-                                        onChange={handleChange('trainingsPerWeek')}
-                                    >
-                                        {[1, 2, 3, 4, 5, 6, 7].map((num) => (
-                                            <MenuItem key={num} value={num}>
-                                                {num} {num === 1 ? 'time' : 'times'}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                </Grid>
-                                <Grid size={{ xs: 12 }}>
-                                    <FormLabel component="legend">Training Preferences</FormLabel>
-                                    <FormGroup row>
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox
-                                                    checked={!!profile.giTraining}
-                                                    onChange={handleChange('giTraining')}
-                                                    name="giTraining"
-                                                />
-                                            }
-                                            label="Gi"
-                                        />
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox
-                                                    checked={!!profile.noGiTraining}
-                                                    onChange={handleChange('noGiTraining')}
-                                                    name="noGiTraining"
-                                                />
-                                            }
-                                            label="No-Gi"
-                                        />
-                                    </FormGroup>
-                                </Grid>
-                                <Grid size={{ xs: 12 }}>
-                                    <TextField
-                                        label="Training Notes / Journey"
-                                        multiline
-                                        rows={4}
-                                        fullWidth
-                                        value={profile.notes || ''}
-                                        onChange={handleChange('notes')}
-                                        placeholder="Keep track of your overall BJJ goals, favorite quotes, or general thoughts..."
-                                    />
-                                </Grid>
-                                <Grid size={{ xs: 12 }}>
-                                    <Box display="flex" justifyContent="flex-end">
-                                        <Button
-                                            type="submit"
-                                            variant="contained"
-                                            color="primary"
-                                            size="large"
-                                            disabled={saving}
-                                        >
-                                            {saving ? 'Saving...' : 'Save Profile'}
-                                        </Button>
-                                    </Box>
-                                </Grid>
+                        <Grid container spacing={3}>
+                            <Grid size={{ xs: 12 }}>
+                                <Typography variant="h5" fontWeight="bold">{profile.name || 'Anonymous Grappler'}</Typography>
+                                <Typography color="text.secondary" sx={{ textTransform: 'capitalize' }}>
+                                    {profile.belt || 'White'} Belt • {profile.stripes || 0} Stripes
+                                </Typography>
                             </Grid>
-                        </form>
+
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <Typography variant="subtitle2" color="text.secondary">Birth Year</Typography>
+                                <Typography variant="body1">{profile.birthYear || 'Not specified'}</Typography>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <Typography variant="subtitle2" color="text.secondary">BJJ Experience</Typography>
+                                <Typography variant="body1">
+                                    {profile.bjjExperience !== undefined ? `${profile.bjjExperience} years` : 'Not specified'}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <Typography variant="subtitle2" color="text.secondary">Trainings Per Week</Typography>
+                                <Typography variant="body1">
+                                    {profile.trainingsPerWeek ? `${profile.trainingsPerWeek} times` : 'Not specified'}
+                                </Typography>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <Typography variant="subtitle2" color="text.secondary">Preferences</Typography>
+                                <Typography variant="body1">
+                                    {[profile.giTraining && 'Gi', profile.noGiTraining && 'No-Gi'].filter(Boolean).join(' • ') || 'Not specified'}
+                                </Typography>
+                            </Grid>
+
+                            {profile.notes && (
+                                <Grid size={{ xs: 12 }}>
+                                    <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>Notes & Journey</Typography>
+                                    <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.default', borderRadius: 2 }}>
+                                        <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                                            {profile.notes}
+                                        </Typography>
+                                    </Paper>
+                                </Grid>
+                            )}
+                        </Grid>
                     </Paper>
+
+                    <Dialog
+                        open={isEditDialogOpen}
+                        onClose={() => setIsEditDialogOpen(false)}
+                        maxWidth="sm"
+                        fullWidth
+                        PaperProps={{
+                            sx: { borderRadius: 3 }
+                        }}
+                    >
+                        <DialogTitle sx={{ pb: 1 }}>
+                            Edit Profile
+                            <IconButton
+                                aria-label="close"
+                                onClick={() => setIsEditDialogOpen(false)}
+                                sx={{
+                                    position: 'absolute',
+                                    right: 16,
+                                    top: 16,
+                                    color: (theme) => theme.palette.grey[500],
+                                }}
+                            >
+                                <Close />
+                            </IconButton>
+                        </DialogTitle>
+                        <form onSubmit={handleSave}>
+                            <DialogContent dividers sx={{ pt: 3 }}>
+                                <Grid container spacing={3}>
+                                    <Grid size={{ xs: 12 }}>
+                                        <TextField
+                                            label="Name"
+                                            fullWidth
+                                            value={profile.name || ''}
+                                            onChange={handleChange('name')}
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid size={{ xs: 12, sm: 6 }}>
+                                        <TextField
+                                            select
+                                            label="Belt"
+                                            fullWidth
+                                            value={profile.belt || 'white'}
+                                            onChange={handleChange('belt')}
+                                            sx={{ textTransform: 'capitalize' }}
+                                        >
+                                            {BELTS.map((belt) => (
+                                                <MenuItem key={belt} value={belt} sx={{ textTransform: 'capitalize' }}>
+                                                    {belt}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    </Grid>
+                                    <Grid size={{ xs: 12, sm: 6 }}>
+                                        <TextField
+                                            select
+                                            label="Stripes"
+                                            fullWidth
+                                            value={profile.stripes || 1}
+                                            onChange={handleChange('stripes')}
+                                        >
+                                            {STRIPES.map((stripe) => (
+                                                <MenuItem key={stripe} value={stripe}>
+                                                    {stripe}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    </Grid>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
+                                        <TextField
+                                            label="Birth Year"
+                                            type="number"
+                                            fullWidth
+                                            value={profile.birthYear || ''}
+                                            onChange={handleChange('birthYear')}
+                                            inputProps={{ min: 1900, max: new Date().getFullYear() }}
+                                        />
+                                    </Grid>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
+                                        <TextField
+                                            label="BJJ Experience (Years)"
+                                            type="number"
+                                            fullWidth
+                                            value={profile.bjjExperience === undefined ? '' : profile.bjjExperience}
+                                            onChange={handleChange('bjjExperience')}
+                                            inputProps={{ min: 0, step: 0.5 }}
+                                        />
+                                    </Grid>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
+                                        <TextField
+                                            select
+                                            label="Trainings Per Week"
+                                            fullWidth
+                                            value={profile.trainingsPerWeek || ''}
+                                            onChange={handleChange('trainingsPerWeek')}
+                                        >
+                                            {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                                                <MenuItem key={num} value={num}>
+                                                    {num} {num === 1 ? 'time' : 'times'}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    </Grid>
+                                    <Grid size={{ xs: 12 }}>
+                                        <FormLabel component="legend">Training Preferences</FormLabel>
+                                        <FormGroup row>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={!!profile.giTraining}
+                                                        onChange={handleChange('giTraining')}
+                                                        name="giTraining"
+                                                    />
+                                                }
+                                                label="Gi"
+                                            />
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={!!profile.noGiTraining}
+                                                        onChange={handleChange('noGiTraining')}
+                                                        name="noGiTraining"
+                                                    />
+                                                }
+                                                label="No-Gi"
+                                            />
+                                        </FormGroup>
+                                    </Grid>
+                                    <Grid size={{ xs: 12 }}>
+                                        <TextField
+                                            label="Training Notes / Journey"
+                                            multiline
+                                            rows={4}
+                                            fullWidth
+                                            value={profile.notes || ''}
+                                            onChange={handleChange('notes')}
+                                            placeholder="Keep track of your overall BJJ goals, favorite quotes, or general thoughts..."
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </DialogContent>
+                            <DialogActions sx={{ px: 3, py: 2 }}>
+                                <Button onClick={() => setIsEditDialogOpen(false)} color="inherit" sx={{ fontWeight: 600 }}>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
+                                    disabled={saving}
+                                    sx={{ fontWeight: 600, px: 3 }}
+                                >
+                                    {saving ? 'Saving...' : 'Save Profile'}
+                                </Button>
+                            </DialogActions>
+                        </form>
+                    </Dialog>
                 </Grid>
 
                 <Grid size={{ xs: 12, md: 5 }}>
