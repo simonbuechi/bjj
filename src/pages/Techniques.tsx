@@ -1,18 +1,95 @@
 import { useState, useEffect } from 'react';
 import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem, Fab, Tooltip, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { ViewModule, ViewList, ChevronRight, Add as AddIcon, FilterList, ExpandMore } from '@mui/icons-material';
-// ... rest remains same until container ...
+import { Link as RouterLink } from 'react-router-dom';
+import { getTechniques, getUserProfile } from '../services/db';
+import type { Technique, TechniqueType, UserProfile } from '../types';
+import TechniqueCard from '../components/techniques/TechniqueCard';
+import { useAuth } from '../context/AuthContext';
+
+
+
+const Home = () => {
+    const { currentUser } = useAuth();
+    const [techniques, setTechniques] = useState<Technique[]>([]);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [filter, setFilter] = useState<TechniqueType | 'all'>('all');
+    const [markerFilter, setMarkerFilter] = useState<'all' | 'favorite' | 'learning' | 'toLearn'>('all');
+    const [skillFilter, setSkillFilter] = useState<number | 'all'>('all');
+
+    const displayedTechniques = techniques.filter(tech => {
+        // filter by type
+        if (filter !== 'all' && tech.type !== filter) return false;
+
+        // filter by marker (only if a profile is present and specifically filtering)
+        if (currentUser && profile && markerFilter !== 'all') {
+            const techStatus = profile.markedTechniques?.[tech.id];
+            if (!techStatus || !techStatus[markerFilter]) return false;
+        }
+
+        // filter by skill level
+        if (currentUser && profile && skillFilter !== 'all') {
+            const techStatus = profile.markedTechniques?.[tech.id];
+            if (!techStatus || techStatus.skillLevel !== skillFilter) return false;
+        }
+
+        return true;
+    });
+
+    useEffect(() => {
+        const fetchTechniques = async () => {
+            try {
+                setLoading(true);
+                const data = await getTechniques();
+                setTechniques(data);
+
+                if (currentUser) {
+                    const userProfile = await getUserProfile(currentUser.uid);
+                    setProfile(userProfile);
+                }
+            } catch (err) {
+                console.error(err);
+                setError('Failed to load techniques.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTechniques();
+    }, [currentUser]);
+
+
+
+    const handleViewChange = (
+        _event: React.MouseEvent<HTMLElement>,
+        newView: 'grid' | 'list' | null,
+    ) => {
+        if (newView !== null) {
+            setViewMode(newView);
+        }
+    };
+
+    if (loading) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
 
     return (
         <Container maxWidth="lg">
             {techniques.length > 0 && (
                 <Box sx={{ mb: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    
+
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="h4" component="h1">
                             Techniques
                         </Typography>
-                        
+
                         <ToggleButtonGroup
                             value={viewMode}
                             exclusive
@@ -29,9 +106,9 @@ import { ViewModule, ViewList, ChevronRight, Add as AddIcon, FilterList, ExpandM
                         </ToggleButtonGroup>
                     </Box>
 
-                    <Accordion 
-                        elevation={0} 
-                        variant="outlined" 
+                    <Accordion
+                        elevation={0}
+                        variant="outlined"
                         defaultExpanded={typeof window !== 'undefined' && window.innerWidth > 900}
                         sx={{ borderRadius: 2, '&:before': { display: 'none' } }}
                     >
@@ -39,12 +116,12 @@ import { ViewModule, ViewList, ChevronRight, Add as AddIcon, FilterList, ExpandM
                             expandIcon={<ExpandMore />}
                             aria-controls="filter-content"
                             id="filter-header"
-                            sx={{ bgcolor: 'background.default', borderRadius: 2 }}
+                            sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
                         >
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <FilterList color="action" />
                                 <Typography fontWeight={500}>Filters</Typography>
-                                
+
                                 {(filter !== 'all' || markerFilter !== 'all' || skillFilter !== 'all') && (
                                     <Chip label="Active" size="small" color="primary" sx={{ ml: 1, height: 20 }} />
                                 )}

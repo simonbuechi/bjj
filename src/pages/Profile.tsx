@@ -4,9 +4,9 @@ import {
     Button, MenuItem, CircularProgress, Alert, Grid,
     FormControlLabel, Checkbox, FormGroup, FormLabel,
     List, ListItem, ListItemText, Divider,
-    Dialog, DialogTitle, DialogContent, DialogActions, IconButton
+    Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Collapse
 } from '@mui/material';
-import { Favorite, School, MenuBook, Close, Edit, Logout } from '@mui/icons-material';
+import { Favorite, School, MenuBook, Close, Edit, Logout, ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserProfile, updateUserProfile, createUserProfile, getTechniques } from '../services/db';
@@ -36,6 +36,9 @@ const Profile = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [favoritesExpanded, setFavoritesExpanded] = useState(true);
+    const [learningExpanded, setLearningExpanded] = useState(true);
+    const [toLearnExpanded, setToLearnExpanded] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -197,6 +200,23 @@ const Profile = () => {
                                         </Typography>
                                     </Paper>
                                 </Grid>
+                            )}
+
+                            {currentUser && (
+                                <>
+                                    <Grid size={{ xs: 12, sm: 6 }}>
+                                        <Typography variant="subtitle2" color="text.secondary">Member Since</Typography>
+                                        <Typography variant="body1">
+                                            {currentUser.metadata.creationTime ? new Date(currentUser.metadata.creationTime).toLocaleDateString() : 'Unknown'}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid size={{ xs: 12, sm: 6 }}>
+                                        <Typography variant="subtitle2" color="text.secondary">Last Login</Typography>
+                                        <Typography variant="body1">
+                                            {currentUser.metadata.lastSignInTime ? new Date(currentUser.metadata.lastSignInTime).toLocaleDateString() : 'Unknown'}
+                                        </Typography>
+                                    </Grid>
+                                </>
                             )}
 
                             {currentUser && (
@@ -378,57 +398,84 @@ const Profile = () => {
                 <Grid size={{ xs: 12, md: 5 }}>
                     <Box sx={{ position: 'sticky', top: 24, display: 'flex', flexDirection: 'column', gap: 3 }}>
                         <Paper elevation={3} sx={{ p: 3, mt: { xs: 0, md: 4 }, borderRadius: 2 }}>
-                            <Typography variant="h6" gutterBottom display="flex" alignItems="center">
-                                <Favorite color="primary" sx={{ mr: 1 }} /> Favorites
-                            </Typography>
-                            <Divider sx={{ mb: 2 }} />
-                            {favoriteTechs.length === 0 ? (
-                                <Typography variant="body2" color="text.secondary">No favorite techniques yet.</Typography>
-                            ) : (
-                                <List disablePadding>
-                                    {favoriteTechs.map(tech => (
-                                        <ListItem key={tech.id} component={RouterLink} to={`/techniques/${tech.id}`} sx={{ px: 1, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' }, borderRadius: 1 }}>
-                                            <ListItemText primary={tech.name} secondary={tech.type} secondaryTypographyProps={{ textTransform: 'capitalize' }} />
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            )}
+                            <Box display="flex" justifyContent="space-between" alignItems="center" onClick={() => setFavoritesExpanded(!favoritesExpanded)} sx={{ cursor: 'pointer' }}>
+                                <Typography variant="h6" display="flex" alignItems="center">
+                                    <Favorite color="primary" sx={{ mr: 1 }} /> Favorites ({favoriteTechs.length})
+                                </Typography>
+                                <IconButton size="small" disableRipple sx={{ p: 0 }}>
+                                    {favoritesExpanded ? <ExpandLess /> : <ExpandMore />}
+                                </IconButton>
+                            </Box>
+                            <Collapse in={favoritesExpanded}>
+                                <Box mt={2}>
+                                    <Divider sx={{ mb: 2 }} />
+                                    {favoriteTechs.length === 0 ? (
+                                        <Typography variant="body2" color="text.secondary">No favorite techniques yet.</Typography>
+                                    ) : (
+                                        <List disablePadding>
+                                            {favoriteTechs.map(tech => (
+                                                <ListItem key={tech.id} component={RouterLink} to={`/techniques/${tech.id}`} sx={{ px: 1, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' }, borderRadius: 1 }}>
+                                                    <ListItemText primary={tech.name} secondary={tech.type} secondaryTypographyProps={{ textTransform: 'capitalize' }} />
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                    )}
+                                </Box>
+                            </Collapse>
                         </Paper>
 
                         <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-                            <Typography variant="h6" gutterBottom display="flex" alignItems="center">
-                                <School color="primary" sx={{ mr: 1 }} /> Currently Learning
-                            </Typography>
-                            <Divider sx={{ mb: 2 }} />
-                            {learningTechs.length === 0 ? (
-                                <Typography variant="body2" color="text.secondary">No techniques currently learning.</Typography>
-                            ) : (
-                                <List disablePadding>
-                                    {learningTechs.map(tech => (
-                                        <ListItem key={tech.id} component={RouterLink} to={`/techniques/${tech.id}`} sx={{ px: 1, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' }, borderRadius: 1 }}>
-                                            <ListItemText primary={tech.name} secondary={tech.type} secondaryTypographyProps={{ textTransform: 'capitalize' }} />
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            )}
+                            <Box display="flex" justifyContent="space-between" alignItems="center" onClick={() => setLearningExpanded(!learningExpanded)} sx={{ cursor: 'pointer' }}>
+                                <Typography variant="h6" display="flex" alignItems="center">
+                                    <School color="primary" sx={{ mr: 1 }} /> Currently Learning ({learningTechs.length})
+                                </Typography>
+                                <IconButton size="small" disableRipple sx={{ p: 0 }}>
+                                    {learningExpanded ? <ExpandLess /> : <ExpandMore />}
+                                </IconButton>
+                            </Box>
+                            <Collapse in={learningExpanded}>
+                                <Box mt={2}>
+                                    <Divider sx={{ mb: 2 }} />
+                                    {learningTechs.length === 0 ? (
+                                        <Typography variant="body2" color="text.secondary">No techniques currently learning.</Typography>
+                                    ) : (
+                                        <List disablePadding>
+                                            {learningTechs.map(tech => (
+                                                <ListItem key={tech.id} component={RouterLink} to={`/techniques/${tech.id}`} sx={{ px: 1, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' }, borderRadius: 1 }}>
+                                                    <ListItemText primary={tech.name} secondary={tech.type} secondaryTypographyProps={{ textTransform: 'capitalize' }} />
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                    )}
+                                </Box>
+                            </Collapse>
                         </Paper>
 
                         <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-                            <Typography variant="h6" gutterBottom display="flex" alignItems="center">
-                                <MenuBook color="primary" sx={{ mr: 1 }} /> To Learn
-                            </Typography>
-                            <Divider sx={{ mb: 2 }} />
-                            {toLearnTechs.length === 0 ? (
-                                <Typography variant="body2" color="text.secondary">No techniques marked to learn.</Typography>
-                            ) : (
-                                <List disablePadding>
-                                    {toLearnTechs.map(tech => (
-                                        <ListItem key={tech.id} component={RouterLink} to={`/techniques/${tech.id}`} sx={{ px: 1, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' }, borderRadius: 1 }}>
-                                            <ListItemText primary={tech.name} secondary={tech.type} secondaryTypographyProps={{ textTransform: 'capitalize' }} />
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            )}
+                            <Box display="flex" justifyContent="space-between" alignItems="center" onClick={() => setToLearnExpanded(!toLearnExpanded)} sx={{ cursor: 'pointer' }}>
+                                <Typography variant="h6" display="flex" alignItems="center">
+                                    <MenuBook color="primary" sx={{ mr: 1 }} /> To Learn ({toLearnTechs.length})
+                                </Typography>
+                                <IconButton size="small" disableRipple sx={{ p: 0 }}>
+                                    {toLearnExpanded ? <ExpandLess /> : <ExpandMore />}
+                                </IconButton>
+                            </Box>
+                            <Collapse in={toLearnExpanded}>
+                                <Box mt={2}>
+                                    <Divider sx={{ mb: 2 }} />
+                                    {toLearnTechs.length === 0 ? (
+                                        <Typography variant="body2" color="text.secondary">No techniques marked to learn.</Typography>
+                                    ) : (
+                                        <List disablePadding>
+                                            {toLearnTechs.map(tech => (
+                                                <ListItem key={tech.id} component={RouterLink} to={`/techniques/${tech.id}`} sx={{ px: 1, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' }, borderRadius: 1 }}>
+                                                    <ListItemText primary={tech.name} secondary={tech.type} secondaryTypographyProps={{ textTransform: 'capitalize' }} />
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                    )}
+                                </Box>
+                            </Collapse>
                         </Paper>
                     </Box>
                 </Grid>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Typography, Box, Grid, CircularProgress, Alert, Container, Button, Card, CardContent } from '@mui/material';
-import { Add as AddIcon, LibraryBooks as LibraryBooksIcon, Favorite } from '@mui/icons-material';
+
 import { Link as RouterLink } from 'react-router-dom';
 import { getUserProfile, getJournalEntries } from '../services/db';
 import { useAuth } from '../context/AuthContext';
@@ -127,7 +127,6 @@ const Home = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                     <Card elevation={3} sx={{ height: '100%', borderRadius: 2, transition: '0.3s', '&:hover': { transform: 'translateY(-4px)', boxShadow: 6 } }}>
                         <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 4, height: '100%' }}>
-                            <AddIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                             <Typography variant="h3" color="primary" sx={{ fontWeight: 'bold' }}>
                                 {sessionsCount !== null ? sessionsCount : '-'}
                             </Typography>
@@ -140,7 +139,6 @@ const Home = () => {
                                     color="primary"
                                     component={RouterLink}
                                     to="/journal"
-                                    startIcon={<AddIcon />}
                                     fullWidth
                                     size="large"
                                 >
@@ -155,7 +153,6 @@ const Home = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                     <Card elevation={3} sx={{ height: '100%', borderRadius: 2, transition: '0.3s', '&:hover': { transform: 'translateY(-4px)', boxShadow: 6 } }}>
                         <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 4, height: '100%' }}>
-                            <Favorite color="primary" sx={{ fontSize: 48, mb: 2 }} />
                             <Typography variant="h3" color="primary" sx={{ fontWeight: 'bold' }}>
                                 {favoriteCount !== null ? favoriteCount : '-'}
                             </Typography>
@@ -168,7 +165,6 @@ const Home = () => {
                                     color="primary"
                                     component={RouterLink}
                                     to="/techniques"
-                                    startIcon={<LibraryBooksIcon />}
                                     fullWidth
                                     size="large"
                                 >
