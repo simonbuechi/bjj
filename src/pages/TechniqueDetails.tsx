@@ -10,6 +10,25 @@ import { getTechniqueById, getUserProfile, updateUserProfile, getJournalEntries 
 import type { Technique, UserProfile, MarkedStatus, JournalEntry } from '../types';
 import { useAuth } from '../context/AuthContext';
 
+const updateTechniqueStatus = (
+    profile: UserProfile,
+    techniqueId: string,
+    statusUpdate: Partial<MarkedStatus>
+): Record<string, MarkedStatus> => {
+    const currentStatus = profile.markedTechniques?.[techniqueId] || {};
+    const updatedStatus = { ...currentStatus, ...statusUpdate };
+
+    const isEmpty = !updatedStatus.favorite && !updatedStatus.learning && !updatedStatus.toLearn && !updatedStatus.skillLevel;
+
+    const updatedMarked = { ...(profile.markedTechniques || {}) };
+    if (isEmpty) {
+        delete updatedMarked[techniqueId];
+    } else {
+        updatedMarked[techniqueId] = updatedStatus;
+    }
+    return updatedMarked;
+};
+
 const TechniqueDetails = () => {
     const { id } = useParams<{ id: string }>();
     const { currentUser } = useAuth();
@@ -64,27 +83,11 @@ const TechniqueDetails = () => {
         if (!currentUser || !id || !profile) return;
 
         try {
-            const currentTechniqueStatus = profile.markedTechniques?.[id] || {};
-            const newValue = !currentTechniqueStatus[key];
+            const currentValue = profile.markedTechniques?.[id]?.[key];
+            const updatedMarked = updateTechniqueStatus(profile, id, { [key]: !currentValue });
 
-            const updatedStatus = { ...currentTechniqueStatus, [key]: newValue };
-
-            // Clean up if all properties are false/undefined
-            const isEmtpy = !updatedStatus.favorite && !updatedStatus.learning && !updatedStatus.toLearn && !updatedStatus.skillLevel;
-
-            const updatedProfile = { ...profile };
-            if (!updatedProfile.markedTechniques) {
-                updatedProfile.markedTechniques = {};
-            }
-
-            if (isEmtpy) {
-                delete updatedProfile.markedTechniques[id];
-            } else {
-                updatedProfile.markedTechniques[id] = updatedStatus;
-            }
-
-            setProfile(updatedProfile);
-            await updateUserProfile(currentUser.uid, { markedTechniques: updatedProfile.markedTechniques });
+            setProfile({ ...profile, markedTechniques: updatedMarked });
+            await updateUserProfile(currentUser.uid, { markedTechniques: updatedMarked });
         } catch (err) {
             console.error("Failed to update status", err);
         }
@@ -94,25 +97,12 @@ const TechniqueDetails = () => {
         if (!currentUser || !id || !profile) return;
 
         try {
-            const currentTechniqueStatus = profile.markedTechniques?.[id] || {};
+            const updatedMarked = updateTechniqueStatus(profile, id, {
+                skillLevel: newValue === null ? undefined : newValue
+            });
 
-            const updatedStatus = { ...currentTechniqueStatus, skillLevel: newValue === null ? undefined : newValue };
-
-            const isEmtpy = !updatedStatus.favorite && !updatedStatus.learning && !updatedStatus.toLearn && !updatedStatus.skillLevel;
-
-            const updatedProfile = { ...profile };
-            if (!updatedProfile.markedTechniques) {
-                updatedProfile.markedTechniques = {};
-            }
-
-            if (isEmtpy) {
-                delete updatedProfile.markedTechniques[id];
-            } else {
-                updatedProfile.markedTechniques[id] = updatedStatus;
-            }
-
-            setProfile(updatedProfile);
-            await updateUserProfile(currentUser.uid, { markedTechniques: updatedProfile.markedTechniques });
+            setProfile({ ...profile, markedTechniques: updatedMarked });
+            await updateUserProfile(currentUser.uid, { markedTechniques: updatedMarked });
         } catch (err) {
             console.error("Failed to update rating", err);
         }

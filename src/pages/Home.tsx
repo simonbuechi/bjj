@@ -7,6 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import Login from './Login';
 import packageJson from '../../package.json';
 
+const APP_DESCRIPTION = `BJJ Amigo helps you track your trainings and manage your progress. (v${packageJson.version})`;
+
 const Home = () => {
     const { currentUser } = useAuth();
     const [sessionsCount, setSessionsCount] = useState<number | null>(null);
@@ -59,7 +61,7 @@ const Home = () => {
                             <CardContent sx={{ p: { xs: 2.5, sm: 4 }, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
                                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>About</Typography>
                                 <Typography variant="body1" sx={{ mb: { xs: 2, md: 4 }, flexGrow: 1, fontSize: { xs: '1rem', md: '1.1rem' } }}>
-                                    BJJ Amigo helps you track your trainings and manage your progress. (v{packageJson.version})
+                                    {APP_DESCRIPTION}
                                 </Typography>
                                 <Box>
                                     <Button
@@ -108,7 +110,7 @@ const Home = () => {
                     <Card elevation={3} sx={{ borderRadius: 2 }}>
                         <CardContent sx={{ p: { xs: 2.5, sm: 4 }, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: { xs: 2, sm: 3 } }}>
                             <Typography variant="body1" sx={{ fontSize: { xs: '1rem', md: '1.1rem' }, textAlign: { xs: 'center', sm: 'left' } }}>
-                                BJJ Amigo helps you track your trainings and manage your progress. (v{packageJson.version})
+                                {APP_DESCRIPTION}
                             </Typography>
                             <Button
                                 variant="outlined"

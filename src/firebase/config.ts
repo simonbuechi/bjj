@@ -2,7 +2,6 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDqIXaRumK5xO4MHbe5qAO6wWU992ivk2M",
@@ -16,13 +15,12 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const analytics = getAnalytics(app);
 
 // Initialize Firebase services
 export const auth = getAuth(app);
 
-// Explicitly set persistence
-setPersistence(auth, browserLocalPersistence).catch((error) => {
+// Set persistence and export the promise so consumers can await it
+export const persistenceReady = setPersistence(auth, browserLocalPersistence).catch((error) => {
     console.error("Failed to set auth persistence:", error);
 });
 

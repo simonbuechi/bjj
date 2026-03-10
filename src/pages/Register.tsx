@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Typography, Box, TextField, Button, Paper, Alert } from '@mui/material';
-import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider } from '../firebase/config';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, persistenceReady } from '../firebase/config';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ const Register = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { googleSignIn } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,6 +25,7 @@ const Register = () => {
         try {
             setError('');
             setLoading(true);
+            await persistenceReady;
             await createUserWithEmailAndPassword(auth, email, password);
             navigate('/');
         } catch (err) {
@@ -37,7 +40,7 @@ const Register = () => {
         try {
             setError('');
             setLoading(true);
-            await signInWithPopup(auth, googleProvider);
+            await googleSignIn();
             navigate('/');
         } catch (err) {
             setError('Failed to sign up with Google');

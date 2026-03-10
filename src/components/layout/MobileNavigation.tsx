@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
 import { Home, LibraryBooks, Book, Person } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -6,20 +5,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const MobileNavigation = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [value, setValue] = useState(0);
+    const getNavigationValue = () => {
+        if (location.pathname === '/') return 0;
+        if (location.pathname.startsWith('/techniques')) return 1;
+        if (location.pathname.startsWith('/journal')) return 2;
+        if (location.pathname.startsWith('/profile')) return 3;
+        return 0;
+    };
 
-    useEffect(() => {
-        // Keep the selected state in sync with the current URL path
-        if (location.pathname === '/') {
-            setValue(0);
-        } else if (location.pathname.startsWith('/techniques')) {
-            setValue(1);
-        } else if (location.pathname.startsWith('/journal')) {
-            setValue(2);
-        } else if (location.pathname.startsWith('/profile')) {
-            setValue(3);
-        }
-    }, [location.pathname]);
+    const value = getNavigationValue();
 
     return (
         <Paper
@@ -37,7 +31,6 @@ const MobileNavigation = () => {
                 showLabels
                 value={value}
                 onChange={(_, newValue) => {
-                    setValue(newValue);
                     if (newValue === 0) navigate('/');
                     else if (newValue === 1) navigate('/techniques');
                     else if (newValue === 2) navigate('/journal');

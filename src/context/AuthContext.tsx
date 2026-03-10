@@ -1,15 +1,17 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { type User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
+import { type User, onAuthStateChanged, signOut as firebaseSignOut, signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider, persistenceReady } from '../firebase/config';
 
 interface AuthContextType {
     currentUser: User | null;
     loading: boolean;
     logout: () => Promise<void>;
+    googleSignIn: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (context === undefined) {
@@ -35,14 +37,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return unsubscribe;
     }, []);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         return firebaseSignOut(auth);
-    };
+    }, []);
+
+    const googleSignIn = useCallback(async () => {
+        await persistenceReady;
+        await signInWithPopup(auth, googleProvider);
+    }, []);
 
     const value = {
         currentUser,
         loading,
-        logout
+        logout,
+        googleSignIn
     };
 
     return (

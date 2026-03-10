@@ -54,8 +54,6 @@ const Navbar = () => {
                     </Typography>
                 </Box>
 
-
-
                 {/* Desktop menu */}
                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, alignItems: 'center' }}>
                     {pages.map((page) => (

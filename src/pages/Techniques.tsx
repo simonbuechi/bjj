@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem, Fab, Tooltip, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
-import { ViewModule, ViewList, ChevronRight, Add as AddIcon, FilterList, ExpandMore, PlayCircleOutline, Link as LinkIcon, Favorite, School, MenuBook, Star, StarBorder } from '@mui/icons-material';
+import { ViewModule, ViewList, ChevronRight, Add as AddIcon, FilterList, ExpandMore, PlayCircleOutline, Link as LinkIcon } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { getTechniques, getUserProfile } from '../services/db';
 import type { Technique, TechniqueType, UserProfile } from '../types';
 import TechniqueCard from '../components/techniques/TechniqueCard';
+import MarkerIcons from '../components/techniques/MarkerIcons';
 import { useAuth } from '../context/AuthContext';
 
 
 
-const Home = () => {
+const Techniques = () => {
     const { currentUser } = useAuth();
     const [techniques, setTechniques] = useState<Technique[]>([]);
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -251,35 +252,8 @@ const Home = () => {
                                                 </Tooltip>
                                             )}
                                             {profile?.markedTechniques?.[technique.id] && (
-                                                <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 0.5 }}>
-                                                    {profile.markedTechniques[technique.id].favorite && (
-                                                        <Tooltip title="Favorite">
-                                                            <Favorite color="error" fontSize="small" />
-                                                        </Tooltip>
-                                                    )}
-                                                    {profile.markedTechniques[technique.id].learning && (
-                                                        <Tooltip title="Currently Learning">
-                                                            <School color="primary" fontSize="small" />
-                                                        </Tooltip>
-                                                    )}
-                                                    {profile.markedTechniques[technique.id].toLearn && (
-                                                        <Tooltip title="To Learn">
-                                                            <MenuBook color="secondary" fontSize="small" />
-                                                        </Tooltip>
-                                                    )}
-                                                    {profile.markedTechniques[technique.id].skillLevel !== undefined && (
-                                                        <Tooltip title={`Skill Level: ${profile.markedTechniques[technique.id].skillLevel}`}>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', ml: 0.5 }}>
-                                                                {[1, 2, 3, 4, 5].map((star) => (
-                                                                    star <= (profile.markedTechniques[technique.id].skillLevel || 0) ? (
-                                                                        <Star key={star} sx={{ color: 'gold', fontSize: '1rem' }} />
-                                                                    ) : (
-                                                                        <StarBorder key={star} sx={{ color: 'action.disabled', fontSize: '1rem' }} />
-                                                                    )
-                                                                ))}
-                                                            </Box>
-                                                        </Tooltip>
-                                                    )}
+                                                <Box sx={{ ml: 1 }}>
+                                                    <MarkerIcons status={profile.markedTechniques[technique.id]} />
                                                 </Box>
                                             )}
                                         </Box>
@@ -309,4 +283,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default Techniques;

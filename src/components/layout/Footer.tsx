@@ -1,6 +1,8 @@
 import { Box, Container, Typography, Link as MuiLink } from '@mui/material';
 import packageJson from '../../../package.json';
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 const Footer = () => {
     return (
         <Box
@@ -24,7 +26,7 @@ const Footer = () => {
             >
 
                 <Typography variant="body2" color="text.secondary">
-                    &copy; {new Date().getFullYear()} Simon Buechi | v{packageJson.version} | &nbsp;
+                    &copy; {CURRENT_YEAR} Simon Buechi | v{packageJson.version} | &nbsp;
                     <MuiLink href="https://github.com/simonbuechi/bjj" target="_blank" rel="noopener noreferrer" color="inherit">
                         GitHub Repo
                     </MuiLink>

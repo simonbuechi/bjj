@@ -1,7 +1,8 @@
 import { Card, CardActionArea, CardContent, CardMedia, Typography, Chip, Box, Tooltip } from '@mui/material';
-import { PlayCircleOutline, Link as LinkIcon, Favorite, School, MenuBook, Star, StarBorder } from '@mui/icons-material';
+import { PlayCircleOutline, Link as LinkIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import type { Technique, UserProfile } from '../../types';
+import MarkerIcons from './MarkerIcons';
 
 interface TechniqueCardProps {
     technique: Technique;
@@ -10,6 +11,7 @@ interface TechniqueCardProps {
 
 const TechniqueCard = ({ technique, userProfile }: TechniqueCardProps) => {
     const navigate = useNavigate();
+    const markerStatus = userProfile?.markedTechniques?.[technique.id];
 
     return (
         <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -72,36 +74,8 @@ const TechniqueCard = ({ technique, userProfile }: TechniqueCardProps) => {
                         </Box>
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                            <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                {userProfile?.markedTechniques?.[technique.id]?.favorite && (
-                                    <Tooltip title="Favorite">
-                                        <Favorite sx={{ color: '#ff4081', fontSize: '1.2rem', filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.8))' }} />
-                                    </Tooltip>
-                                )}
-                                {userProfile?.markedTechniques?.[technique.id]?.learning && (
-                                    <Tooltip title="Currently Learning">
-                                        <School sx={{ color: '#64b5f6', fontSize: '1.2rem', filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.8))' }} />
-                                    </Tooltip>
-                                )}
-                                {userProfile?.markedTechniques?.[technique.id]?.toLearn && (
-                                    <Tooltip title="To Learn">
-                                        <MenuBook sx={{ color: '#e0e0e0', fontSize: '1.2rem', filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.8))' }} />
-                                    </Tooltip>
-                                )}
-                            </Box>
-
-                            {userProfile?.markedTechniques?.[technique.id]?.skillLevel !== undefined && (
-                                <Tooltip title={`Skill Level: ${userProfile.markedTechniques[technique.id].skillLevel}`}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            star <= (userProfile.markedTechniques?.[technique.id]?.skillLevel || 0) ? (
-                                                <Star key={star} sx={{ color: 'gold', fontSize: '1rem', filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.8))' }} />
-                                            ) : (
-                                                <StarBorder key={star} sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '1rem', filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.8))' }} />
-                                            )
-                                        ))}
-                                    </Box>
-                                </Tooltip>
+                            {markerStatus && (
+                                <MarkerIcons status={markerStatus} withShadow />
                             )}
                         </Box>
                     </Box>

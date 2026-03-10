@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     Typography, Box, Container, Paper, TextField,
@@ -8,13 +8,23 @@ import { PhotoCamera } from '@mui/icons-material';
 import imageCompression from 'browser-image-compression';
 import { getTechniqueById, createTechnique, updateTechnique, getTechniques, uploadImage, deleteImage } from '../services/db';
 import type { Technique, TechniqueType } from '../types';
-import { auth } from '../firebase/config';
+import { useAuth } from '../context/AuthContext';
 
 const TECHNIQUE_TYPES: TechniqueType[] = ['position', 'submission', 'escape', 'guard pass', 'sweep', 'frame'];
+
+const isValidUrl = (str: string): boolean => {
+    try {
+        const url = new URL(str);
+        return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+        return false;
+    }
+};
 
 export default function TechniqueForm() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
     const isEditing = Boolean(id);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,6 +49,19 @@ export default function TechniqueForm() {
 
     const [videoInput, setVideoInput] = useState('');
     const [resourceInput, setResourceInput] = useState('');
+    const [videoInputError, setVideoInputError] = useState('');
+    const [resourceInputError, setResourceInputError] = useState('');
+
+    // Create stable object URLs for image previews and revoke on cleanup
+    const previewUrls = useMemo(() => {
+        return newImageFiles.map(file => URL.createObjectURL(file));
+    }, [newImageFiles]);
+
+    useEffect(() => {
+        return () => {
+            previewUrls.forEach(url => URL.revokeObjectURL(url));
+        };
+    }, [previewUrls]);
 
     useEffect(() => {
         const fetchInitialData = async () => {
@@ -121,13 +144,22 @@ export default function TechniqueForm() {
     };
 
     const handleAddVideo = () => {
-        if (videoInput.trim() && !formData.videos?.includes(videoInput.trim())) {
-            setFormData({
-                ...formData,
-                videos: [...(formData.videos || []), videoInput.trim()]
-            });
-            setVideoInput('');
+        const trimmed = videoInput.trim();
+        if (!trimmed) return;
+        if (!isValidUrl(trimmed)) {
+            setVideoInputError('Please enter a valid URL (https://...)');
+            return;
         }
+        if (formData.videos?.includes(trimmed)) {
+            setVideoInputError('This URL has already been added');
+            return;
+        }
+        setFormData({
+            ...formData,
+            videos: [...(formData.videos || []), trimmed]
+        });
+        setVideoInput('');
+        setVideoInputError('');
     };
 
     const handleRemoveVideo = (indexToRemove: number) => {
@@ -138,13 +170,22 @@ export default function TechniqueForm() {
     };
 
     const handleAddResource = () => {
-        if (resourceInput.trim() && !formData.resources?.includes(resourceInput.trim())) {
-            setFormData({
-                ...formData,
-                resources: [...(formData.resources || []), resourceInput.trim()]
-            });
-            setResourceInput('');
+        const trimmed = resourceInput.trim();
+        if (!trimmed) return;
+        if (!isValidUrl(trimmed)) {
+            setResourceInputError('Please enter a valid URL (https://...)');
+            return;
         }
+        if (formData.resources?.includes(trimmed)) {
+            setResourceInputError('This URL has already been added');
+            return;
+        }
+        setFormData({
+            ...formData,
+            resources: [...(formData.resources || []), trimmed]
+        });
+        setResourceInput('');
+        setResourceInputError('');
     };
 
     const handleRemoveResource = (indexToRemove: number) => {
@@ -157,7 +198,7 @@ export default function TechniqueForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!auth.currentUser) {
+        if (!currentUser) {
             setError("You must be logged in to save techniques.");
             return;
         }
@@ -178,7 +219,7 @@ export default function TechniqueForm() {
             for (const file of newImageFiles) {
                 // Create a unique filename based on time and user ID
                 const timestamp = new Date().getTime();
-                const path = `techniques/${auth.currentUser.uid}/${timestamp}_${file.name}`;
+                const path = `techniques/${currentUser.uid}/${timestamp}_${file.name}`;
                 const url = await uploadImage(file, path);
                 newImageUrls.push(url);
             }
@@ -287,7 +328,7 @@ export default function TechniqueForm() {
                                 <Box display="flex" flexWrap="wrap" gap={2}>
                                     {/* Existing Images */}
                                     {formData.images.map((img, index) => (
-                                        <Box key={`existing-${index}`} position="relative" width={100} height={100}>
+                                        <Box key={`existing-${img}`} position="relative" width={100} height={100}>
                                             <img src={img} alt={`Existing ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }} />
                                             <Button
                                                 size="small"
@@ -303,8 +344,8 @@ export default function TechniqueForm() {
 
                                     {/* New Images Pending Upload */}
                                     {newImageFiles.map((file, index) => (
-                                        <Box key={`new-${index}`} position="relative" width={100} height={100}>
-                                            <img src={URL.createObjectURL(file)} alt={`New ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4, filter: 'brightness(0.7)' }} />
+                                        <Box key={`new-${file.name}-${file.size}`} position="relative" width={100} height={100}>
+                                            <img src={previewUrls[index]} alt={`New ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4, filter: 'brightness(0.7)' }} />
                                             <Typography variant="caption" sx={{ position: 'absolute', bottom: 4, left: 4, color: 'white', fontWeight: 'bold' }}>New</Typography>
                                             <Button
                                                 size="small"
@@ -329,8 +370,10 @@ export default function TechniqueForm() {
                                     fullWidth
                                     size="small"
                                     value={videoInput}
-                                    onChange={(e) => setVideoInput(e.target.value)}
+                                    onChange={(e) => { setVideoInput(e.target.value); setVideoInputError(''); }}
                                     placeholder="https://youtube.com/watch?v=..."
+                                    error={!!videoInputError}
+                                    helperText={videoInputError}
                                 />
                                 <Button variant="outlined" onClick={handleAddVideo}>Add</Button>
                             </Box>
@@ -355,8 +398,10 @@ export default function TechniqueForm() {
                                     fullWidth
                                     size="small"
                                     value={resourceInput}
-                                    onChange={(e) => setResourceInput(e.target.value)}
+                                    onChange={(e) => { setResourceInput(e.target.value); setResourceInputError(''); }}
                                     placeholder="https://example.com/article"
+                                    error={!!resourceInputError}
+                                    helperText={resourceInputError}
                                 />
                                 <Button variant="outlined" onClick={handleAddResource}>Add</Button>
                             </Box>

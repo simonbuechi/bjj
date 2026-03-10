@@ -3,20 +3,21 @@ import {
     Typography, Box, Container, Paper, TextField,
     Button, MenuItem, CircularProgress, Alert, Grid,
     FormControlLabel, Checkbox, FormGroup, FormLabel,
-    List, ListItem, ListItemText, Divider, Chip,
-    Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Collapse
+    Dialog, DialogTitle, DialogContent, DialogActions, IconButton
 } from '@mui/material';
-import { Favorite, School, MenuBook, Close, Edit, Logout, ExpandLess, ExpandMore } from '@mui/icons-material';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Favorite, School, MenuBook, Close, Edit, Logout } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getUserProfile, updateUserProfile, createUserProfile, getTechniques } from '../services/db';
+import { getUserProfile, createUserProfile, getTechniques } from '../services/db';
 import type { UserProfile, BeltColor, Technique } from '../types';
+import TechniqueListSection from '../components/techniques/TechniqueListSection';
 
 const BELTS: BeltColor[] = ['white', 'blue', 'purple', 'brown', 'black'];
 const STRIPES = [1, 2, 3, 4, 5];
 
 const Profile = () => {
     const { currentUser, logout } = useAuth();
+    const navigate = useNavigate();
     const [profile, setProfile] = useState<Partial<UserProfile>>({
         name: '',
         birthYear: undefined,
@@ -73,19 +74,16 @@ const Profile = () => {
     }, [currentUser]);
 
     const handleChange = (field: keyof UserProfile) => (event: React.ChangeEvent<HTMLInputElement>) => {
-        let value: any = event.target.value;
-
-        // Convert specific fields to numbers
+        let value: string | number | boolean | undefined = event.target.value;
+        
         if (field === 'birthYear' || field === 'bjjExperience' || field === 'trainingsPerWeek') {
-            value = value === '' ? undefined : Number(value);
+            value = event.target.value === '' ? undefined : Number(event.target.value);
         } else if (field === 'giTraining' || field === 'noGiTraining') {
             value = event.target.checked;
         }
 
         setProfile({ ...profile, [field]: value });
     };
-
-    const navigate = useNavigate();
 
     const handleLogout = async () => {
         try {
@@ -97,7 +95,6 @@ const Profile = () => {
     };
 
     const handleSave = async (e: React.FormEvent) => {
-        // ... (existing handleSave)
         e.preventDefault();
         if (!currentUser) return;
 
@@ -106,12 +103,8 @@ const Profile = () => {
             setError('');
             setMessage('');
 
-            const existing = await getUserProfile(currentUser.uid);
-            if (existing) {
-                await updateUserProfile(currentUser.uid, profile as Partial<UserProfile>);
-            } else {
-                await createUserProfile(currentUser.uid, profile as Partial<UserProfile>);
-            }
+            // Use setDoc with merge (createUserProfile) unconditionally — no extra read needed
+            await createUserProfile(currentUser.uid, profile as Partial<UserProfile>);
 
             setMessage('Profile updated successfully');
             setIsEditDialogOpen(false);
@@ -397,182 +390,27 @@ const Profile = () => {
 
                 <Grid size={{ xs: 12, md: 5 }}>
                     <Box sx={{ position: 'sticky', top: 24, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        <Paper elevation={3} sx={{ p: 3, mt: { xs: 0, md: 4 }, borderRadius: 2 }}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center" onClick={() => setFavoritesExpanded(!favoritesExpanded)} sx={{ cursor: 'pointer' }}>
-                                <Typography variant="h6" display="flex" alignItems="center">
-                                    <Favorite color="primary" sx={{ mr: 1 }} /> Favorites ({favoriteTechs.length})
-                                </Typography>
-                                <IconButton size="small" disableRipple sx={{ p: 0 }}>
-                                    {favoritesExpanded ? <ExpandLess /> : <ExpandMore />}
-                                </IconButton>
-                            </Box>
-                            <Collapse in={favoritesExpanded}>
-                                <Box mt={2}>
-                                    <Divider sx={{ mb: 2 }} />
-                                    {favoriteTechs.length === 0 ? (
-                                        <Typography variant="body2" color="text.secondary">No favorite techniques yet.</Typography>
-                                    ) : (
-                                        <List disablePadding>
-                                            {favoriteTechs.map(tech => (
-                                                <ListItem
-                                                    key={tech.id}
-                                                    component={RouterLink}
-                                                    to={`/techniques/${tech.id}`}
-                                                    dense
-                                                    sx={{
-                                                        px: 1,
-                                                        py: 0.5,
-                                                        color: 'inherit',
-                                                        textDecoration: 'none',
-                                                        '&:hover': { bgcolor: 'action.hover' },
-                                                        borderRadius: 1,
-                                                        display: 'flex',
-                                                        justifyContent: 'flex-start',
-                                                        alignItems: 'center',
-                                                        gap: 1.5
-                                                    }}
-                                                >
-                                                    <Chip
-                                                        label={tech.type}
-                                                        size="small"
-                                                        variant="outlined"
-                                                        color="primary"
-                                                        sx={{
-                                                            height: 20,
-                                                            fontSize: '0.65rem',
-                                                            textTransform: 'capitalize',
-                                                            flexShrink: 0,
-                                                            minWidth: '75px'
-                                                        }}
-                                                    />
-                                                    <Typography variant="body2" sx={{ mr: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                        {tech.name}
-                                                    </Typography>
-                                                </ListItem>
-                                            ))}
-                                        </List>
-                                    )}
-                                </Box>
-                            </Collapse>
-                        </Paper>
-
-                        <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center" onClick={() => setLearningExpanded(!learningExpanded)} sx={{ cursor: 'pointer' }}>
-                                <Typography variant="h6" display="flex" alignItems="center">
-                                    <School color="primary" sx={{ mr: 1 }} /> Currently Learning ({learningTechs.length})
-                                </Typography>
-                                <IconButton size="small" disableRipple sx={{ p: 0 }}>
-                                    {learningExpanded ? <ExpandLess /> : <ExpandMore />}
-                                </IconButton>
-                            </Box>
-                            <Collapse in={learningExpanded}>
-                                <Box mt={2}>
-                                    <Divider sx={{ mb: 2 }} />
-                                    {learningTechs.length === 0 ? (
-                                        <Typography variant="body2" color="text.secondary">No techniques currently learning.</Typography>
-                                    ) : (
-                                        <List disablePadding>
-                                            {learningTechs.map(tech => (
-                                                <ListItem
-                                                    key={tech.id}
-                                                    component={RouterLink}
-                                                    to={`/techniques/${tech.id}`}
-                                                    dense
-                                                    sx={{
-                                                        px: 1,
-                                                        py: 0.5,
-                                                        color: 'inherit',
-                                                        textDecoration: 'none',
-                                                        '&:hover': { bgcolor: 'action.hover' },
-                                                        borderRadius: 1,
-                                                        display: 'flex',
-                                                        justifyContent: 'flex-start',
-                                                        alignItems: 'center',
-                                                        gap: 1.5
-                                                    }}
-                                                >
-                                                    <Chip
-                                                        label={tech.type}
-                                                        size="small"
-                                                        variant="outlined"
-                                                        color="primary"
-                                                        sx={{
-                                                            height: 20,
-                                                            fontSize: '0.65rem',
-                                                            textTransform: 'capitalize',
-                                                            flexShrink: 0,
-                                                            minWidth: '75px'
-                                                        }}
-                                                    />
-                                                    <Typography variant="body2" sx={{ mr: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                        {tech.name}
-                                                    </Typography>
-                                                </ListItem>
-                                            ))}
-                                        </List>
-                                    )}
-                                </Box>
-                            </Collapse>
-                        </Paper>
-
-                        <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center" onClick={() => setToLearnExpanded(!toLearnExpanded)} sx={{ cursor: 'pointer' }}>
-                                <Typography variant="h6" display="flex" alignItems="center">
-                                    <MenuBook color="primary" sx={{ mr: 1 }} /> To Learn ({toLearnTechs.length})
-                                </Typography>
-                                <IconButton size="small" disableRipple sx={{ p: 0 }}>
-                                    {toLearnExpanded ? <ExpandLess /> : <ExpandMore />}
-                                </IconButton>
-                            </Box>
-                            <Collapse in={toLearnExpanded}>
-                                <Box mt={2}>
-                                    <Divider sx={{ mb: 2 }} />
-                                    {toLearnTechs.length === 0 ? (
-                                        <Typography variant="body2" color="text.secondary">No techniques marked to learn.</Typography>
-                                    ) : (
-                                        <List disablePadding>
-                                            {toLearnTechs.map(tech => (
-                                                <ListItem
-                                                    key={tech.id}
-                                                    component={RouterLink}
-                                                    to={`/techniques/${tech.id}`}
-                                                    dense
-                                                    sx={{
-                                                        px: 1,
-                                                        py: 0.5,
-                                                        color: 'inherit',
-                                                        textDecoration: 'none',
-                                                        '&:hover': { bgcolor: 'action.hover' },
-                                                        borderRadius: 1,
-                                                        display: 'flex',
-                                                        justifyContent: 'flex-start',
-                                                        alignItems: 'center',
-                                                        gap: 1.5
-                                                    }}
-                                                >
-                                                    <Chip
-                                                        label={tech.type}
-                                                        size="small"
-                                                        variant="outlined"
-                                                        color="primary"
-                                                        sx={{
-                                                            height: 20,
-                                                            fontSize: '0.65rem',
-                                                            textTransform: 'capitalize',
-                                                            flexShrink: 0,
-                                                            minWidth: '75px'
-                                                        }}
-                                                    />
-                                                    <Typography variant="body2" sx={{ mr: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                        {tech.name}
-                                                    </Typography>
-                                                </ListItem>
-                                            ))}
-                                        </List>
-                                    )}
-                                </Box>
-                            </Collapse>
-                        </Paper>
+                        <TechniqueListSection
+                            icon={<Favorite color="primary" sx={{ mr: 1 }} />}
+                            title="Favorites"
+                            techniques={favoriteTechs}
+                            expanded={favoritesExpanded}
+                            onToggle={() => setFavoritesExpanded(!favoritesExpanded)}
+                        />
+                        <TechniqueListSection
+                            icon={<School color="primary" sx={{ mr: 1 }} />}
+                            title="Currently Learning"
+                            techniques={learningTechs}
+                            expanded={learningExpanded}
+                            onToggle={() => setLearningExpanded(!learningExpanded)}
+                        />
+                        <TechniqueListSection
+                            icon={<MenuBook color="primary" sx={{ mr: 1 }} />}
+                            title="To Learn"
+                            techniques={toLearnTechs}
+                            expanded={toLearnExpanded}
+                            onToggle={() => setToLearnExpanded(!toLearnExpanded)}
+                        />
                     </Box>
                 </Grid>
             </Grid>
