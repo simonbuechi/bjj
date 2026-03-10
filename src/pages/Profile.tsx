@@ -3,7 +3,7 @@ import {
     Typography, Box, Container, Paper, TextField,
     Button, MenuItem, CircularProgress, Alert, Grid,
     FormControlLabel, Checkbox, FormGroup, FormLabel,
-    List, ListItem, ListItemText, Divider,
+    List, ListItem, ListItemText, Divider, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Collapse
 } from '@mui/material';
 import { Favorite, School, MenuBook, Close, Edit, Logout, ExpandLess, ExpandMore } from '@mui/icons-material';
@@ -414,8 +414,40 @@ const Profile = () => {
                                     ) : (
                                         <List disablePadding>
                                             {favoriteTechs.map(tech => (
-                                                <ListItem key={tech.id} component={RouterLink} to={`/techniques/${tech.id}`} sx={{ px: 1, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' }, borderRadius: 1 }}>
-                                                    <ListItemText primary={tech.name} secondary={tech.type} secondaryTypographyProps={{ textTransform: 'capitalize' }} />
+                                                <ListItem
+                                                    key={tech.id}
+                                                    component={RouterLink}
+                                                    to={`/techniques/${tech.id}`}
+                                                    dense
+                                                    sx={{
+                                                        px: 1,
+                                                        py: 0.5,
+                                                        color: 'inherit',
+                                                        textDecoration: 'none',
+                                                        '&:hover': { bgcolor: 'action.hover' },
+                                                        borderRadius: 1,
+                                                        display: 'flex',
+                                                        justifyContent: 'flex-start',
+                                                        alignItems: 'center',
+                                                        gap: 1.5
+                                                    }}
+                                                >
+                                                    <Chip
+                                                        label={tech.type}
+                                                        size="small"
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        sx={{
+                                                            height: 20,
+                                                            fontSize: '0.65rem',
+                                                            textTransform: 'capitalize',
+                                                            flexShrink: 0,
+                                                            minWidth: '75px'
+                                                        }}
+                                                    />
+                                                    <Typography variant="body2" sx={{ mr: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                        {tech.name}
+                                                    </Typography>
                                                 </ListItem>
                                             ))}
                                         </List>
@@ -441,8 +473,40 @@ const Profile = () => {
                                     ) : (
                                         <List disablePadding>
                                             {learningTechs.map(tech => (
-                                                <ListItem key={tech.id} component={RouterLink} to={`/techniques/${tech.id}`} sx={{ px: 1, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' }, borderRadius: 1 }}>
-                                                    <ListItemText primary={tech.name} secondary={tech.type} secondaryTypographyProps={{ textTransform: 'capitalize' }} />
+                                                <ListItem
+                                                    key={tech.id}
+                                                    component={RouterLink}
+                                                    to={`/techniques/${tech.id}`}
+                                                    dense
+                                                    sx={{
+                                                        px: 1,
+                                                        py: 0.5,
+                                                        color: 'inherit',
+                                                        textDecoration: 'none',
+                                                        '&:hover': { bgcolor: 'action.hover' },
+                                                        borderRadius: 1,
+                                                        display: 'flex',
+                                                        justifyContent: 'flex-start',
+                                                        alignItems: 'center',
+                                                        gap: 1.5
+                                                    }}
+                                                >
+                                                    <Chip
+                                                        label={tech.type}
+                                                        size="small"
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        sx={{
+                                                            height: 20,
+                                                            fontSize: '0.65rem',
+                                                            textTransform: 'capitalize',
+                                                            flexShrink: 0,
+                                                            minWidth: '75px'
+                                                        }}
+                                                    />
+                                                    <Typography variant="body2" sx={{ mr: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                        {tech.name}
+                                                    </Typography>
                                                 </ListItem>
                                             ))}
                                         </List>
@@ -468,8 +532,40 @@ const Profile = () => {
                                     ) : (
                                         <List disablePadding>
                                             {toLearnTechs.map(tech => (
-                                                <ListItem key={tech.id} component={RouterLink} to={`/techniques/${tech.id}`} sx={{ px: 1, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' }, borderRadius: 1 }}>
-                                                    <ListItemText primary={tech.name} secondary={tech.type} secondaryTypographyProps={{ textTransform: 'capitalize' }} />
+                                                <ListItem
+                                                    key={tech.id}
+                                                    component={RouterLink}
+                                                    to={`/techniques/${tech.id}`}
+                                                    dense
+                                                    sx={{
+                                                        px: 1,
+                                                        py: 0.5,
+                                                        color: 'inherit',
+                                                        textDecoration: 'none',
+                                                        '&:hover': { bgcolor: 'action.hover' },
+                                                        borderRadius: 1,
+                                                        display: 'flex',
+                                                        justifyContent: 'flex-start',
+                                                        alignItems: 'center',
+                                                        gap: 1.5
+                                                    }}
+                                                >
+                                                    <Chip
+                                                        label={tech.type}
+                                                        size="small"
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        sx={{
+                                                            height: 20,
+                                                            fontSize: '0.65rem',
+                                                            textTransform: 'capitalize',
+                                                            flexShrink: 0,
+                                                            minWidth: '75px'
+                                                        }}
+                                                    />
+                                                    <Typography variant="body2" sx={{ mr: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                        {tech.name}
+                                                    </Typography>
                                                 </ListItem>
                                             ))}
                                         </List>
