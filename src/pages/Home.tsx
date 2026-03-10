@@ -5,6 +5,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { getUserProfile, getJournalEntries } from '../services/db';
 import { useAuth } from '../context/AuthContext';
 import Login from './Login';
+import packageJson from '../../package.json';
 
 const Home = () => {
     const { currentUser } = useAuth();
@@ -49,16 +50,16 @@ const Home = () => {
     if (!currentUser) {
         return (
             <Container maxWidth="lg">
-                <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4, fontWeight: 'bold' }}>
+                <Typography variant="h4" component="h1" gutterBottom sx={{ mb: { xs: 2, md: 4 }, fontWeight: 'bold' }}>
                     Welcome to BJJ Amigo
                 </Typography>
-                <Grid container spacing={4} alignItems="stretch">
+                <Grid container spacing={{ xs: 2, md: 4 }} alignItems="stretch">
                     <Grid size={{ xs: 12, md: 6 }}>
                         <Card elevation={3} sx={{ height: '100%', borderRadius: 2 }}>
-                            <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
+                            <CardContent sx={{ p: { xs: 2.5, sm: 4 }, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
                                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>About</Typography>
-                                <Typography variant="body1" sx={{ mb: 4, flexGrow: 1, fontSize: '1.1rem' }}>
-                                    BJJ Amigo helps you track your trainings and manage your progress.
+                                <Typography variant="body1" sx={{ mb: { xs: 2, md: 4 }, flexGrow: 1, fontSize: { xs: '1rem', md: '1.1rem' } }}>
+                                    BJJ Amigo helps you track your trainings and manage your progress. (v{packageJson.version})
                                 </Typography>
                                 <Box>
                                     <Button
@@ -95,19 +96,19 @@ const Home = () => {
 
     return (
         <Container maxWidth="lg">
-            <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4, fontWeight: 'bold' }}>
+            <Typography variant="h4" component="h1" gutterBottom sx={{ mb: { xs: 2, md: 4 }, fontWeight: 'bold' }}>
                 Dashboard
             </Typography>
 
-            {error && <Alert severity="error" sx={{ mb: 4 }}>{error}</Alert>}
+            {error && <Alert severity="error" sx={{ mb: { xs: 2, md: 4 } }}>{error}</Alert>}
 
-            <Grid container spacing={4}>
+            <Grid container spacing={{ xs: 2, md: 4 }}>
                 {/* Welcome Info Card */}
                 <Grid size={{ xs: 12 }}>
                     <Card elevation={3} sx={{ borderRadius: 2 }}>
-                        <CardContent sx={{ p: { xs: 3, sm: 4 }, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: 3 }}>
-                            <Typography variant="body1" sx={{ fontSize: '1.1rem', textAlign: { xs: 'center', sm: 'left' } }}>
-                                BJJ Amigo helps you track your trainings and manage your progress.
+                        <CardContent sx={{ p: { xs: 2.5, sm: 4 }, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: { xs: 2, sm: 3 } }}>
+                            <Typography variant="body1" sx={{ fontSize: { xs: '1rem', md: '1.1rem' }, textAlign: { xs: 'center', sm: 'left' } }}>
+                                BJJ Amigo helps you track your trainings and manage your progress. (v{packageJson.version})
                             </Typography>
                             <Button
                                 variant="outlined"
@@ -126,11 +127,11 @@ const Home = () => {
                 {/* Sessions Stat Card */}
                 <Grid size={{ xs: 12, md: 6 }}>
                     <Card elevation={3} sx={{ height: '100%', borderRadius: 2, transition: '0.3s', '&:hover': { transform: 'translateY(-4px)', boxShadow: 6 } }}>
-                        <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 4, height: '100%' }}>
-                            <Typography variant="h3" color="primary" sx={{ fontWeight: 'bold' }}>
+                        <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: { xs: 2.5, sm: 4 }, height: '100%' }}>
+                            <Typography variant="h3" color="primary" sx={{ fontWeight: 'bold', fontSize: { xs: '2.5rem', md: '3rem' } }}>
                                 {sessionsCount !== null ? sessionsCount : '-'}
                             </Typography>
-                            <Typography variant="h6" color="text.secondary" sx={{ mb: 4, textAlign: 'center' }}>
+                            <Typography variant="h6" color="text.secondary" sx={{ mb: { xs: 2, md: 4 }, textAlign: 'center' }}>
                                 Logged Sessions
                             </Typography>
                             <Box sx={{ mt: 'auto', width: '100%' }}>
@@ -152,11 +153,11 @@ const Home = () => {
                 {/* Favorites Stat Card */}
                 <Grid size={{ xs: 12, md: 6 }}>
                     <Card elevation={3} sx={{ height: '100%', borderRadius: 2, transition: '0.3s', '&:hover': { transform: 'translateY(-4px)', boxShadow: 6 } }}>
-                        <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 4, height: '100%' }}>
-                            <Typography variant="h3" color="primary" sx={{ fontWeight: 'bold' }}>
+                        <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: { xs: 2.5, sm: 4 }, height: '100%' }}>
+                            <Typography variant="h3" color="primary" sx={{ fontWeight: 'bold', fontSize: { xs: '2.5rem', md: '3rem' } }}>
                                 {favoriteCount !== null ? favoriteCount : '-'}
                             </Typography>
-                            <Typography variant="h6" color="text.secondary" sx={{ mb: 4, textAlign: 'center' }}>
+                            <Typography variant="h6" color="text.secondary" sx={{ mb: { xs: 2, md: 4 }, textAlign: 'center' }}>
                                 Favorite Techniques
                             </Typography>
                             <Box sx={{ mt: 'auto', width: '100%' }}>

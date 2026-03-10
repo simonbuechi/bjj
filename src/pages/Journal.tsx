@@ -171,17 +171,17 @@ const Journal = () => {
         <Container maxWidth="md">
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} mt={2}>
                 <Typography variant="h4" component="h1">
-                    Training History
+                    Journal
                 </Typography>
-                <Button 
-                    variant="contained" 
-                    color="primary" 
+                <Button
+                    variant="contained"
+                    color="primary"
                     onClick={() => {
                         handleCancelEdit();
                         setFormDialogOpen(true);
                     }}
                 >
-                    Log New Session
+                    Add Session
                 </Button>
             </Box>
             <Divider sx={{ mb: 3 }} />
@@ -314,71 +314,71 @@ const Journal = () => {
             {/* Journal Entries List */}
             <Box>
 
-                    {entries.length === 0 ? (
-                        <Alert severity="info" variant="outlined">
-                            No journal entries yet. Start logging your training sessions!
-                        </Alert>
-                    ) : (
-                        <List sx={{ p: 0 }}>
-                            {entries.map((entry) => (
-                                <Paper key={entry.id} variant="outlined" sx={{ mb: 2, p: 2, borderRadius: 2 }}>
-                                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                                        <Typography variant="h6" color="primary">
-                                            {new Date(entry.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
-                                            {entry.time && ` • ${entry.time}`}
-                                        </Typography>
-                                        <Box>
-                                            <IconButton size="small" onClick={() => handleEditClick(entry)} color="primary">
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton size="small" onClick={() => handleDeleteClick(entry.id)} color="error">
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </Box>
+                {entries.length === 0 ? (
+                    <Alert severity="info" variant="outlined">
+                        No journal entries yet. Start logging your training sessions!
+                    </Alert>
+                ) : (
+                    <List sx={{ p: 0 }}>
+                        {entries.map((entry) => (
+                            <Paper key={entry.id} variant="outlined" sx={{ mb: 2, p: 2, borderRadius: 2 }}>
+                                <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                                    <Typography variant="h6" color="primary">
+                                        {new Date(entry.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+                                        {entry.time && ` • ${entry.time}`}
+                                    </Typography>
+                                    <Box>
+                                        <IconButton size="small" onClick={() => handleEditClick(entry)} color="primary">
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
+                                        <IconButton size="small" onClick={() => handleDeleteClick(entry.id)} color="error">
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
                                     </Box>
+                                </Box>
 
-                                    <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
+                                <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
+                                    <Chip
+                                        size="small"
+                                        label={entry.isGi !== false ? 'Gi' : 'No-Gi'}
+                                        color={entry.isGi !== false ? 'primary' : 'secondary'}
+                                        variant="outlined"
+                                    />
+                                    {entry.sessionType && (
+                                        <Chip size="small" label={entry.sessionType} variant="outlined" />
+                                    )}
+                                    {entry.length && (
+                                        <Chip size="small" label={`${entry.length} min`} variant="outlined" />
+                                    )}
+                                    {entry.intensity && (
                                         <Chip
                                             size="small"
-                                            label={entry.isGi !== false ? 'Gi' : 'No-Gi'}
-                                            color={entry.isGi !== false ? 'primary' : 'secondary'}
+                                            icon={<Rating value={entry.intensity} readOnly size="small" max={5} sx={{ fontSize: '1rem', ml: 0.5 }} />}
+                                            label={`Intensity`}
                                             variant="outlined"
+                                            sx={{ '& .MuiChip-icon': { color: 'gold' } }}
                                         />
-                                        {entry.sessionType && (
-                                            <Chip size="small" label={entry.sessionType} variant="outlined" />
-                                        )}
-                                        {entry.length && (
-                                            <Chip size="small" label={`${entry.length} min`} variant="outlined" />
-                                        )}
-                                        {entry.intensity && (
-                                            <Chip
-                                                size="small"
-                                                icon={<Rating value={entry.intensity} readOnly size="small" max={5} sx={{ fontSize: '1rem', ml: 0.5 }} />}
-                                                label={`Intensity`}
-                                                variant="outlined"
-                                                sx={{ '& .MuiChip-icon': { color: 'gold' } }}
-                                            />
-                                        )}
+                                    )}
+                                </Box>
+
+                                {entry.techniqueIds && entry.techniqueIds.length > 0 && (
+                                    <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
+                                        {entry.techniqueIds.map(id => (
+                                            <Chip key={id} label={getTechniqueName(id)} size="small" variant="outlined" />
+                                        ))}
                                     </Box>
+                                )}
 
-                                    {entry.techniqueIds && entry.techniqueIds.length > 0 && (
-                                        <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
-                                            {entry.techniqueIds.map(id => (
-                                                <Chip key={id} label={getTechniqueName(id)} size="small" variant="outlined" />
-                                            ))}
-                                        </Box>
-                                    )}
-
-                                    {entry.comment && (
-                                        <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
-                                            {entry.comment}
-                                        </Typography>
-                                    )}
-                                </Paper>
-                            ))}
-                        </List>
-                    )}
-                </Box>
+                                {entry.comment && (
+                                    <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+                                        {entry.comment}
+                                    </Typography>
+                                )}
+                            </Paper>
+                        ))}
+                    </List>
+                )}
+            </Box>
 
             {/* Delete Confirmation Dialog */}
             <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>

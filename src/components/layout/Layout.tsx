@@ -12,8 +12,8 @@ const Layout = () => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Navbar />
-            <Box component="main" sx={{ flexGrow: 1, py: 4, pb: { xs: 10, md: 4 } }}>
-                <Container maxWidth="lg">
+            <Box component="main" sx={{ flexGrow: 1, py: { xs: 2, md: 4 }, pb: { xs: 8, md: 4 } }}>
+                <Container maxWidth="lg" sx={{ px: { xs: 0, sm: 3 } }}>
                     {isOnline ? <Outlet /> : <OfflineView />}
                 </Container>
             </Box>

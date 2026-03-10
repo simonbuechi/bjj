@@ -83,7 +83,7 @@ const Home = () => {
     return (
         <Container maxWidth="lg">
             {techniques.length > 0 && (
-                <Box sx={{ mb: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ mb: { xs: 2, md: 4 }, display: 'flex', flexDirection: 'column', gap: { xs: 1.5, md: 2 } }}>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="h4" component="h1">
@@ -127,8 +127,8 @@ const Home = () => {
                                 )}
                             </Box>
                         </AccordionSummary>
-                        <AccordionDetails>
-                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <AccordionDetails sx={{ p: { xs: 1.5, sm: 2 } }}>
+                            <Box sx={{ display: 'flex', gap: { xs: 1.5, md: 2 }, alignItems: 'center', flexWrap: 'wrap' }}>
                                 <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 }, flex: { xs: '1 1 100%', sm: '1 1 auto' } }}>
                                     <InputLabel id="technique-filter-label">Filter by Type</InputLabel>
                                     <Select
@@ -204,7 +204,7 @@ const Home = () => {
                     No techniques match the selected filter.
                 </Alert>
             ) : viewMode === 'grid' ? (
-                <Grid container spacing={3}>
+                <Grid container spacing={{ xs: 2, md: 3 }}>
                     {displayedTechniques.map((technique) => (
                         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={technique.id}>
                             <TechniqueCard technique={technique} userProfile={profile} />
@@ -224,7 +224,7 @@ const Home = () => {
                                     textDecoration: 'none',
                                     color: 'inherit',
                                     '&:hover': { bgcolor: 'action.hover' },
-                                    py: 2
+                                    py: { xs: 1.5, md: 2 }
                                 }}
                             >
                                 <ListItemText
