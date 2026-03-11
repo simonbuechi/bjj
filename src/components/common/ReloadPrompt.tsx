@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Snackbar, Button, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { registerSW } from 'virtual:pwa-register';
@@ -6,18 +6,21 @@ import { registerSW } from 'virtual:pwa-register';
 const ReloadPrompt = () => {
     const [needRefresh, setNeedRefresh] = useState(false);
     const [offlineReady, setOfflineReady] = useState(false);
+    const updateSWRef = useRef<((reloadPage?: boolean) => Promise<void>) | null>(null);
 
-    const updateSW = registerSW({
-        onNeedRefresh() {
-            setNeedRefresh(true);
-        },
-        onOfflineReady() {
-            setOfflineReady(true);
-        },
-    });
+    useEffect(() => {
+        updateSWRef.current = registerSW({
+            onNeedRefresh() {
+                setNeedRefresh(true);
+            },
+            onOfflineReady() {
+                setOfflineReady(true);
+            },
+        });
+    }, []);
 
     const handleUpdate = () => {
-        updateSW(true);
+        updateSWRef.current?.(true);
     };
 
     const handleClose = () => {

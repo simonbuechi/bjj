@@ -2,20 +2,18 @@ import { useState, useEffect } from 'react';
 import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem, Fab, Tooltip, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { ViewModule, ViewList, ChevronRight, Add as AddIcon, FilterList, ExpandMore, PlayCircleOutline, Link as LinkIcon } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
-import { getTechniques, getUserProfile } from '../services/db';
-import type { Technique, TechniqueType, UserProfile } from '../types';
+import { getUserProfile } from '../services/db';
+import type { TechniqueType, UserProfile } from '../types';
 import TechniqueCard from '../components/techniques/TechniqueCard';
 import MarkerIcons from '../components/techniques/MarkerIcons';
 import { useAuth } from '../context/AuthContext';
-
-
+import { useTechniques } from '../context/TechniquesContext';
 
 const Techniques = () => {
     const { currentUser } = useAuth();
-    const [techniques, setTechniques] = useState<Technique[]>([]);
+    const { techniques, loading: techniquesLoading, error: techniquesError, loadTechniques } = useTechniques();
     const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const [error] = useState('');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [filter, setFilter] = useState<TechniqueType | 'all'>('all');
     const [markerFilter, setMarkerFilter] = useState<'all' | 'favorite' | 'learning' | 'toLearn'>('all');
@@ -41,26 +39,26 @@ const Techniques = () => {
     });
 
     useEffect(() => {
-        const fetchTechniques = async () => {
-            try {
-                setLoading(true);
-                const data = await getTechniques();
-                setTechniques(data);
+        loadTechniques();
+    }, [loadTechniques]);
 
-                if (currentUser) {
-                    const userProfile = await getUserProfile(currentUser.uid);
-                    setProfile(userProfile);
-                }
+    useEffect(() => {
+        const fetchProfile = async () => {
+            if (!currentUser) return;
+            try {
+                const userProfile = await getUserProfile(currentUser.uid);
+                setProfile(userProfile);
             } catch (err) {
                 console.error(err);
-                setError('Failed to load techniques.');
-            } finally {
-                setLoading(false);
+                // Profile error isn't fatal to seeing the list
             }
         };
 
-        fetchTechniques();
+        fetchProfile();
     }, [currentUser]);
+
+    const loading = techniquesLoading && techniques.length === 0;
+    const currentError = error || techniquesError;
 
 
 
@@ -194,9 +192,9 @@ const Techniques = () => {
                 </Box>
             )}
 
-            {error && <Alert severity="error" sx={{ mb: 4 }}>{error}</Alert>}
+            {currentError && <Alert severity="error" sx={{ mb: 4 }}>{currentError}</Alert>}
 
-            {techniques.length === 0 && !error ? (
+            {techniques.length === 0 && !currentError ? (
                 <Alert severity="info" sx={{ mt: 4 }}>
                     No techniques found. Log in to add some techniques to the database.
                 </Alert>

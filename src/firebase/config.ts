@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'firebase/auth';
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
+import { getFirestore, initializeFirestore, persistentLocalCache } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -25,9 +25,19 @@ export const persistenceReady = setPersistence(auth, browserLocalPersistence).ca
 });
 
 export const googleProvider = new GoogleAuthProvider();
-export const db = initializeFirestore(app, {
-    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
-});
+
+// HMR-safe Firestore initialization
+let dbInstance;
+try {
+    dbInstance = initializeFirestore(app, {
+        localCache: persistentLocalCache()
+    }, 'default');
+} catch (e) {
+    // If already initialized (common in HMR), use existing instance
+    dbInstance = getFirestore(app, 'default');
+}
+
+export const db = dbInstance;
 export const storage = getStorage(app);
 
 export default app;
