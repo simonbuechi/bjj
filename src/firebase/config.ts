@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -25,7 +25,9 @@ export const persistenceReady = setPersistence(auth, browserLocalPersistence).ca
 });
 
 export const googleProvider = new GoogleAuthProvider();
-export const db = getFirestore(app, 'default');
+export const db = initializeFirestore(app, {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+});
 export const storage = getStorage(app);
 
 export default app;
