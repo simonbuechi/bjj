@@ -389,7 +389,7 @@ const Profile = () => {
                 </Grid>
 
                 <Grid size={{ xs: 12, md: 5 }}>
-                    <Box sx={{ position: 'sticky', top: 24, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <Box sx={{ position: 'sticky', top: 24, mt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
                         <TechniqueListSection
                             icon={<Favorite color="primary" sx={{ mr: 1 }} />}
                             title="Favorites"
