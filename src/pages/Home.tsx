@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Typography, Box, Grid, CircularProgress, Alert, Container, Button, Card, CardContent } from '@mui/material';
+import GetAppIcon from '@mui/icons-material/GetApp';
 
 import { Link as RouterLink } from 'react-router-dom';
 import { getUserProfile, getJournalEntries } from '../services/db';
 import { useAuth } from '../context/AuthContext';
+import { usePwaInstall } from '../hooks/usePwaInstall';
 import Login from './Login';
 import packageJson from '../../package.json';
 
@@ -11,6 +13,7 @@ const APP_DESCRIPTION = `BJJ Amigo helps you track your trainings and manage you
 
 const Home = () => {
     const { currentUser } = useAuth();
+    const { isInstallable, install } = usePwaInstall();
     const [sessionsCount, setSessionsCount] = useState<number | null>(null);
     const [favoriteCount, setFavoriteCount] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
@@ -177,6 +180,28 @@ const Home = () => {
                         </CardContent>
                     </Card>
                 </Grid>
+
+                {/* PWA Install Card */}
+                {isInstallable && (
+                    <Grid size={{ xs: 12 }}>
+                        <Card elevation={3} sx={{ borderRadius: 2 }}>
+                            <CardContent sx={{ p: { xs: 2.5, sm: 4 }, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: { xs: 2, sm: 3 } }}>
+                                <Typography variant="body1" sx={{ fontSize: { xs: '1rem', md: '1.1rem' }, textAlign: { xs: 'center', sm: 'left' } }}>
+                                    Install BJJ Amigo on your device for faster access, offline support, and a better experience.
+                                </Typography>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={install}
+                                    startIcon={<GetAppIcon />}
+                                    sx={{ minWidth: '150px' }}
+                                >
+                                    Install App
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                )}
 
             </Grid>
         </Container>

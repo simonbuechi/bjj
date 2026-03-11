@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import TechniqueDetails from './pages/TechniqueDetails';
 import TechniqueForm from './pages/TechniqueForm';
 import Journal from './pages/Journal';
+import ReloadPrompt from './components/common/ReloadPrompt';
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
+      <ReloadPrompt />
     </AuthProvider>
   );
 }
