@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { TechniquesProvider } from './context/TechniquesContext';
+import { PwaProvider } from './context/PwaContext';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Home from './pages/Home';
@@ -17,7 +18,8 @@ function App() {
   return (
     <AuthProvider>
       <TechniquesProvider>
-        <Router basename="/bjj/">
+        <PwaProvider>
+          <Router basename="/bjj/">
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
@@ -60,6 +62,7 @@ function App() {
             </Route>
           </Routes>
         </Router>
+        </PwaProvider>
         <ReloadPrompt />
       </TechniquesProvider>
     </AuthProvider>

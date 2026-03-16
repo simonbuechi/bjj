@@ -5,7 +5,7 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import { Link as RouterLink } from 'react-router-dom';
 import { getUserProfile, getJournalEntries } from '../services/db';
 import { useAuth } from '../context/AuthContext';
-import { usePwaInstall } from '../hooks/usePwaInstall';
+import { usePwa } from '../context/PwaContext';
 import Login from './Login';
 import packageJson from '../../package.json';
 
@@ -13,7 +13,7 @@ const APP_DESCRIPTION = `BJJ Amigo helps you track your trainings and manage you
 
 const Home = () => {
     const { currentUser } = useAuth();
-    const { isInstallable, install } = usePwaInstall();
+    const { isInstallable, install } = usePwa();
     const [sessionsCount, setSessionsCount] = useState<number | null>(null);
     const [favoriteCount, setFavoriteCount] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
