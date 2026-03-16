@@ -14,9 +14,9 @@ export default defineConfig({
         name: 'BJJ Amigo',
         short_name: 'BJJ',
         description: 'A journal and technique tracker for Brazilian Jiu-Jitsu.',
-        theme_color: '#2e9fd0',
-        background_color: '#2e9fd0',
-        display: 'fullscreen',
+        theme_color: '#ffffff',
+        background_color: '#ffffff',
+        display: 'standalone',
         orientation: 'portrait',
         start_url: '/bjj/',
         lang: 'en-US',
@@ -27,13 +27,25 @@ export default defineConfig({
             src: 'logo-192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
+          },
+          {
+            src: 'logo-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable'
           },
           {
             src: 'logo-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
+          },
+          {
+            src: 'logo-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
           }
         ]
       }

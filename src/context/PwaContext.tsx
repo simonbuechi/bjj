@@ -12,16 +12,36 @@ interface PwaContextType {
 
 const PwaContext = createContext<PwaContextType | undefined>(undefined);
 
+// Global variable to capture the event before the provider mounts
+let earlyDeferredPrompt: BeforeInstallPromptEvent | null = null;
+
+if (typeof window !== 'undefined') {
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        earlyDeferredPrompt = e as BeforeInstallPromptEvent;
+        console.log('early beforeinstallprompt event captured');
+    });
+}
+
 export const PwaProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [isInstallable, setIsInstallable] = useState(false);
 
     useEffect(() => {
+        // Check if the event was already captured
+        if (earlyDeferredPrompt) {
+            setDeferredPrompt(earlyDeferredPrompt);
+            setIsInstallable(true);
+        }
+
         const handler = (e: Event) => {
             // Prevent the mini-infobar from appearing on mobile
             e.preventDefault();
             // Stash the event so it can be triggered later.
-            setDeferredPrompt(e as BeforeInstallPromptEvent);
+            const promptEvent = e as BeforeInstallPromptEvent;
+            setDeferredPrompt(promptEvent);
+            earlyDeferredPrompt = promptEvent;
             // Update UI notify the user they can install the PWA
             setIsInstallable(true);
             console.log('beforeinstallprompt event fired');
