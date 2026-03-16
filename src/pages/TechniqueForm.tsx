@@ -6,9 +6,10 @@ import {
 } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
 import imageCompression from 'browser-image-compression';
-import { getTechniqueById, createTechnique, updateTechnique, getTechniques, uploadImage, deleteImage } from '../services/db';
+import { getTechniqueById, createTechnique, updateTechnique, uploadImage, deleteImage } from '../services/db';
 import type { Technique, TechniqueType } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { useTechniques } from '../context/TechniquesContext';
 
 const TECHNIQUE_TYPES: TechniqueType[] = ['position', 'submission', 'escape', 'guard pass', 'sweep', 'frame'];
 
@@ -25,14 +26,13 @@ export default function TechniqueForm() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const { techniques: allTechniques, loadTechniques, refreshTechniques } = useTechniques();
     const isEditing = Boolean(id);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [loading, setLoading] = useState(isEditing);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
-
-    const [allTechniques, setAllTechniques] = useState<Technique[]>([]);
 
     const [formData, setFormData] = useState<Omit<Technique, 'id'>>({
         name: '',
@@ -66,9 +66,8 @@ export default function TechniqueForm() {
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
-                // Fetch all techniques for the connected techniques dropdown
-                const techniques = await getTechniques();
-                setAllTechniques(techniques);
+                // Ensure techniques are loaded in context
+                loadTechniques();
 
                 if (isEditing && id) {
                     const tech = await getTechniqueById(id);
@@ -95,7 +94,7 @@ export default function TechniqueForm() {
         };
 
         fetchInitialData();
-    }, [id, isEditing]);
+    }, [id, isEditing, loadTechniques]);
 
     const handleChange = (field: keyof Omit<Technique, 'id'>) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [field]: e.target.value });
@@ -233,9 +232,11 @@ export default function TechniqueForm() {
             // 4. Save to firestore
             if (isEditing && id) {
                 await updateTechnique(id, finalData);
+                await refreshTechniques();
                 navigate(`/techniques/${id}`);
             } else {
                 const newId = await createTechnique(finalData);
+                await refreshTechniques();
                 navigate(`/techniques/${newId}`);
             }
         } catch (err) {

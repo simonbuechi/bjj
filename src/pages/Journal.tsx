@@ -7,16 +7,17 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
-import { getJournalEntries, createJournalEntry, updateJournalEntry, deleteJournalEntry, getTechniques } from '../services/db';
+import { useTechniques } from '../context/TechniquesContext';
+import { getJournalEntries, createJournalEntry, updateJournalEntry, deleteJournalEntry } from '../services/db';
 import type { JournalEntry, Technique, SessionType } from '../types';
 
 const SESSION_TYPES: SessionType[] = ['Regular class', 'Private class', 'Open mat', 'Seminar', 'Camp', 'Competition'];
 
 const Journal = () => {
     const { currentUser } = useAuth();
+    const { techniques: allTechniques, loadTechniques } = useTechniques();
 
     const [entries, setEntries] = useState<JournalEntry[]>([]);
-    const [allTechniques, setAllTechniques] = useState<Technique[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -43,12 +44,10 @@ const Journal = () => {
             if (!currentUser) return;
             try {
                 setLoading(true);
-                const [entriesData, techniquesData] = await Promise.all([
-                    getJournalEntries(currentUser.uid),
-                    getTechniques()
-                ]);
+                // Trigger context load if needed
+                loadTechniques();
+                const entriesData = await getJournalEntries(currentUser.uid);
                 setEntries(entriesData);
-                setAllTechniques(techniquesData);
             } catch (err) {
                 console.error(err);
                 setError('Failed to load journal data');
@@ -58,7 +57,7 @@ const Journal = () => {
         };
 
         fetchData();
-    }, [currentUser]);
+    }, [currentUser, loadTechniques]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

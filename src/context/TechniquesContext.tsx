@@ -7,6 +7,7 @@ interface TechniquesContextType {
     loading: boolean;
     error: string;
     loadTechniques: () => Promise<void>;
+    refreshTechniques: () => Promise<void>;
 }
 
 const TechniquesContext = createContext<TechniquesContextType | undefined>(undefined);
@@ -26,9 +27,9 @@ export const TechniquesProvider = ({ children }: { children: ReactNode }) => {
     const [error, setError] = useState('');
     const hasFetched = useRef(false);
 
-    const loadTechniques = useCallback(async () => {
-        // Return cached data if already fetched
-        if (hasFetched.current) return;
+    const loadTechniques = useCallback(async (force = false) => {
+        // Return cached data if already fetched and not forced
+        if (hasFetched.current && !force) return;
 
         try {
             setLoading(true);
@@ -44,8 +45,12 @@ export const TechniquesProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
+    const refreshTechniques = useCallback(async () => {
+        await loadTechniques(true);
+    }, [loadTechniques]);
+
     return (
-        <TechniquesContext.Provider value={{ techniques, loading, error, loadTechniques }}>
+        <TechniquesContext.Provider value={{ techniques, loading, error, loadTechniques: () => loadTechniques(false), refreshTechniques }}>
             {children}
         </TechniquesContext.Provider>
     );
