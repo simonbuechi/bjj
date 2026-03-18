@@ -131,7 +131,7 @@ const Home = () => {
 
                 {/* Sessions Stat Card */}
                 <Grid size={{ xs: 12, md: 6 }}>
-                    <Card elevation={3} sx={{ height: '100%', borderRadius: 2, transition: '0.3s', '&:hover': { transform: 'translateY(-4px)', boxShadow: 6 } }}>
+                    <Card elevation={3} sx={{ height: '100%', borderRadius: 2 }}>
                         <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: { xs: 2.5, sm: 4 }, height: '100%' }}>
                             <Typography variant="h3" color="primary" sx={{ fontWeight: 'bold', fontSize: { xs: '2.5rem', md: '3rem' } }}>
                                 {sessionsCount !== null ? sessionsCount : '-'}
@@ -157,7 +157,7 @@ const Home = () => {
 
                 {/* Favorites Stat Card */}
                 <Grid size={{ xs: 12, md: 6 }}>
-                    <Card elevation={3} sx={{ height: '100%', borderRadius: 2, transition: '0.3s', '&:hover': { transform: 'translateY(-4px)', boxShadow: 6 } }}>
+                    <Card elevation={3} sx={{ height: '100%', borderRadius: 2 }}>
                         <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: { xs: 2.5, sm: 4 }, height: '100%' }}>
                             <Typography variant="h3" color="primary" sx={{ fontWeight: 'bold', fontSize: { xs: '2.5rem', md: '3rem' } }}>
                                 {favoriteCount !== null ? favoriteCount : '-'}

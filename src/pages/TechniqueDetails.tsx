@@ -3,9 +3,10 @@ import { useParams, Link as RouterLink } from 'react-router-dom';
 import {
     Typography, Box, CircularProgress, Container,
     Chip, Grid, Paper, Divider, Button, ToggleButton,
-    List, ListItem, ListItemText, ListItemIcon, Rating
+    List, ListItem, ListItemText, ListItemIcon, Rating,
+    TextField
 } from '@mui/material';
-import { Favorite, MenuBook, School, EventNote, ArrowBack } from '@mui/icons-material';
+import { Favorite, MenuBook, School, EventNote, ArrowBack, EditNote } from '@mui/icons-material';
 import { getTechniqueById, getUserProfile, updateUserProfile, getJournalEntries } from '../services/db';
 import type { Technique, UserProfile, MarkedStatus, JournalEntry } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -18,7 +19,7 @@ const updateTechniqueStatus = (
     const currentStatus = profile.markedTechniques?.[techniqueId] || {};
     const updatedStatus = { ...currentStatus, ...statusUpdate };
 
-    const isEmpty = !updatedStatus.favorite && !updatedStatus.learning && !updatedStatus.toLearn && !updatedStatus.skillLevel;
+    const isEmpty = !updatedStatus.favorite && !updatedStatus.learning && !updatedStatus.toLearn && !updatedStatus.skillLevel && !updatedStatus.notes;
 
     const updatedMarked = { ...(profile.markedTechniques || {}) };
     if (isEmpty) {
@@ -37,6 +38,8 @@ const TechniqueDetails = () => {
     const [connected, setConnected] = useState<Technique[]>([]);
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [sessions, setSessions] = useState<JournalEntry[]>([]);
+    const [notes, setNotes] = useState('');
+    const [isSavingNotes, setIsSavingNotes] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -79,6 +82,12 @@ const TechniqueDetails = () => {
         fetchData();
     }, [id, currentUser]);
 
+    useEffect(() => {
+        if (profile && id) {
+            setNotes(profile.markedTechniques?.[id]?.notes || '');
+        }
+    }, [id, profile]);
+
     const handleStatusToggle = async (key: keyof Omit<MarkedStatus, 'skillLevel'>) => {
         if (!currentUser || !id || !profile) return;
 
@@ -105,6 +114,23 @@ const TechniqueDetails = () => {
             await updateUserProfile(currentUser.uid, { markedTechniques: updatedMarked });
         } catch (err) {
             console.error("Failed to update rating", err);
+        }
+    };
+
+    const handleSaveNotes = async () => {
+        if (!currentUser || !id || !profile) return;
+        const currentNotes = profile.markedTechniques?.[id]?.notes || '';
+        if (notes === currentNotes) return;
+
+        try {
+            setIsSavingNotes(true);
+            const updatedMarked = updateTechniqueStatus(profile, id, { notes });
+            setProfile({ ...profile, markedTechniques: updatedMarked });
+            await updateUserProfile(currentUser.uid, { markedTechniques: updatedMarked });
+        } catch (err) {
+            console.error("Failed to save notes", err);
+        } finally {
+            setIsSavingNotes(false);
         }
     };
 
@@ -226,19 +252,49 @@ const TechniqueDetails = () => {
                             <Box mt={6}>
                                 <Typography variant="h5" gutterBottom>Connected Techniques</Typography>
                                 <Divider sx={{ mb: 2 }} />
-                                <Grid container spacing={2}>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
                                     {connected.map(tech => (
-                                        <Grid size={{ xs: 12, sm: 6 }} key={tech.id}>
-                                            <Paper variant="outlined" sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                                                <Typography variant="subtitle1" fontWeight="bold">{tech.name}</Typography>
-                                                <Typography variant="body2" color="text.secondary" noWrap mb={1}>{tech.description}</Typography>
-                                                <Button component={RouterLink} to={`/techniques/${tech.id}`} size="small" variant="contained">
-                                                    View Details
-                                                </Button>
-                                            </Paper>
-                                        </Grid>
+                                        <Paper
+                                            key={tech.id}
+                                            component={RouterLink}
+                                            to={`/techniques/${tech.id}`}
+                                            variant="outlined"
+                                            sx={{
+                                                px: 2,
+                                                py: 1,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1,
+                                                textDecoration: 'none',
+                                                color: 'inherit',
+                                                borderRadius: 10,
+                                                transition: '0.2s',
+                                                '&:hover': {
+                                                    borderColor: 'primary.main',
+                                                    bgcolor: 'action.hover',
+                                                    transform: 'translateY(-1px)',
+                                                    boxShadow: 1
+                                                }
+                                            }}
+                                        >
+                                            <Typography variant="body1" fontWeight="500">
+                                                {tech.name}
+                                            </Typography>
+                                            <Chip
+                                                label={tech.type}
+                                                size="small"
+                                                variant="outlined"
+                                                color="primary"
+                                                sx={{
+                                                    textTransform: 'capitalize',
+                                                    height: 20,
+                                                    fontSize: '0.75rem',
+                                                    pointerEvents: 'none'
+                                                }}
+                                            />
+                                        </Paper>
                                     ))}
-                                </Grid>
+                                </Box>
                             </Box>
                         )}
                     </Grid>
@@ -304,6 +360,38 @@ const TechniqueDetails = () => {
                                     </Box>
                                 )}
                             </Paper>
+
+                            {currentUser && (
+                                <Paper variant="outlined" sx={{ p: 3 }}>
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <EditNote color="primary" />
+                                            <Typography variant="h6">My Notes</Typography>
+                                        </Box>
+                                        {isSavingNotes && <CircularProgress size={16} />}
+                                    </Box>
+                                    <Divider sx={{ mb: 2 }} />
+                                    <TextField
+                                        multiline
+                                        rows={6}
+                                        fullWidth
+                                        placeholder="Add your personal notes and details about this technique..."
+                                        value={notes}
+                                        onChange={(e) => setNotes(e.target.value)}
+                                        onBlur={handleSaveNotes}
+                                        variant="outlined"
+                                        size="small"
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                bgcolor: 'background.default',
+                                            }
+                                        }}
+                                    />
+                                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                                        Notes are private to you and save automatically.
+                                    </Typography>
+                                </Paper>
+                            )}
 
                             {currentUser && sessions.length > 0 && (
                                 <Paper variant="outlined" sx={{ p: 3 }}>

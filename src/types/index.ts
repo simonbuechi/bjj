@@ -18,6 +18,7 @@ export interface MarkedStatus {
     learning?: boolean;
     toLearn?: boolean;
     skillLevel?: number; // 1-5
+    notes?: string;
 }
 
 export interface UserProfile {

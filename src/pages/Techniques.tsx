@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem, Fab, Tooltip, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
-import { ViewModule, ViewList, ChevronRight, Add as AddIcon, FilterList, ExpandMore, PlayCircleOutline, Link as LinkIcon } from '@mui/icons-material';
+import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem, Fab, Tooltip, Accordion, AccordionSummary, AccordionDetails, Button } from '@mui/material';
+import { ViewModule, ViewList, ChevronRight, FilterList, ExpandMore, PlayCircleOutline, Link as LinkIcon } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { getUserProfile } from '../services/db';
 import type { TechniqueType, UserProfile } from '../types';
@@ -89,20 +89,22 @@ const Techniques = () => {
                             Techniques
                         </Typography>
 
-                        <ToggleButtonGroup
-                            value={viewMode}
-                            exclusive
-                            onChange={handleViewChange}
-                            aria-label="view mode"
-                            size="small"
-                        >
-                            <ToggleButton value="grid" aria-label="grid view">
-                                <ViewModule />
-                            </ToggleButton>
-                            <ToggleButton value="list" aria-label="list view">
-                                <ViewList />
-                            </ToggleButton>
-                        </ToggleButtonGroup>
+                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                            <ToggleButtonGroup
+                                value={viewMode}
+                                exclusive
+                                onChange={handleViewChange}
+                                aria-label="view mode"
+                                size="small"
+                            >
+                                <ToggleButton value="grid" aria-label="grid view">
+                                    <ViewModule />
+                                </ToggleButton>
+                                <ToggleButton value="list" aria-label="list view">
+                                    <ViewList />
+                                </ToggleButton>
+                            </ToggleButtonGroup>
+                        </Box>
                     </Box>
 
                     <Accordion
@@ -264,19 +266,7 @@ const Techniques = () => {
                 </Paper>
             )}
 
-            {currentUser && (
-                <Tooltip title="Add New Technique" placement="left">
-                    <Fab
-                        color="primary"
-                        aria-label="add technique"
-                        component={RouterLink}
-                        to="/techniques/new"
-                        sx={{ position: 'fixed', bottom: 32, right: 32 }}
-                    >
-                        <AddIcon />
-                    </Fab>
-                </Tooltip>
-            )}
+
         </Container>
     );
 };
