@@ -25,15 +25,10 @@ if (typeof window !== 'undefined') {
 }
 
 export const PwaProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-    const [isInstallable, setIsInstallable] = useState(false);
+    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(earlyDeferredPrompt);
+    const [isInstallable, setIsInstallable] = useState(!!earlyDeferredPrompt);
 
     useEffect(() => {
-        // Check if the event was already captured
-        if (earlyDeferredPrompt) {
-            setDeferredPrompt(earlyDeferredPrompt);
-            setIsInstallable(true);
-        }
 
         const handler = (e: Event) => {
             // Prevent the mini-infobar from appearing on mobile
@@ -82,6 +77,7 @@ export const PwaProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const usePwa = () => {
     const context = useContext(PwaContext);
     if (context === undefined) {

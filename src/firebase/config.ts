@@ -32,7 +32,7 @@ try {
     dbInstance = initializeFirestore(app, {
         localCache: persistentLocalCache()
     }, 'default');
-} catch (e) {
+} catch {
     // If already initialized (common in HMR), use existing instance
     dbInstance = getFirestore(app, 'default');
 }

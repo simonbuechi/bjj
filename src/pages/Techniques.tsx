@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem, Fab, Tooltip, Accordion, AccordionSummary, AccordionDetails, Button } from '@mui/material';
+import { Typography, Box, Grid, CircularProgress, Alert, Container, ToggleButtonGroup, ToggleButton, Paper, List, ListItem, ListItemText, Chip, FormControl, InputLabel, Select, MenuItem, Tooltip, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { ViewModule, ViewList, ChevronRight, FilterList, ExpandMore, PlayCircleOutline, Link as LinkIcon } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { getUserProfile } from '../services/db';

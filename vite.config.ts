@@ -12,7 +12,7 @@ export default defineConfig({
       manifest: {
         id: 'bjj',
         name: 'BJJ Amigo',
-        short_name: 'BJJ',
+        short_name: 'BJJ Amigo',
         description: 'A journal and technique tracker for Brazilian Jiu-Jitsu.',
         theme_color: '#ffffff',
         background_color: '#ffffff',
