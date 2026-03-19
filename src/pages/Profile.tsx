@@ -75,7 +75,7 @@ const Profile = () => {
 
     const handleChange = (field: keyof UserProfile) => (event: React.ChangeEvent<HTMLInputElement>) => {
         let value: string | number | boolean | undefined = event.target.value;
-        
+
         if (field === 'birthYear' || field === 'bjjExperience' || field === 'trainingsPerWeek') {
             value = event.target.value === '' ? undefined : Number(event.target.value);
         } else if (field === 'giTraining' || field === 'noGiTraining') {
@@ -139,14 +139,6 @@ const Profile = () => {
                             <Typography variant="h4" component="h1">
                                 Your profile
                             </Typography>
-                            <Button
-                                variant="outlined"
-                                startIcon={<Edit />}
-                                onClick={() => setIsEditDialogOpen(true)}
-                                sx={{ borderRadius: 8 }}
-                            >
-                                Edit Profile
-                            </Button>
                         </Box>
 
                         {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
@@ -214,13 +206,21 @@ const Profile = () => {
 
                             {currentUser && (
                                 <Grid size={{ xs: 12 }}>
-                                    <Box mt={2}>
+
+                                    <Box mt={4} display="flex" gap={2}>
+                                        <Button
+                                            variant="contained"
+                                            startIcon={<Edit />}
+                                            onClick={() => setIsEditDialogOpen(true)}
+                                            sx={{ minWidth: 150 }}
+                                        >
+                                            Edit Profile
+                                        </Button>
                                         <Button
                                             variant="outlined"
-                                            color="error"
                                             onClick={handleLogout}
                                             startIcon={<Logout />}
-                                            fullWidth
+                                            sx={{ minWidth: 150 }}
                                         >
                                             Logout
                                         </Button>

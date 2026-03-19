@@ -101,7 +101,7 @@ const Home = () => {
 
     return (
         <Container maxWidth="lg">
-            <Typography variant="h4" component="h1" gutterBottom sx={{ mb: { xs: 2, md: 4 }, fontWeight: 'bold' }}>
+            <Typography variant="h4" component="h1" gutterBottom sx={{ mb: { xs: 2, md: 4 } }}>
                 Dashboard
             </Typography>
 

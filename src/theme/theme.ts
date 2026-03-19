@@ -7,16 +7,16 @@ import { createTheme, type PaletteMode } from '@mui/material/styles';
 
 export const THEME_COLORS = {
     light: {
-        primary: '#22799eff',    // Vibrant Blue
-        secondary: '#f58f00ff',  // Amber/Warm Orange
-        background: '#eaf6fbff', // Soft Off-white
+        primary: '#9123A6',    // Vibrant Blue
+        secondary: '#D7195F',  // Amber/Warm Orange
+        background: '#f0f5f7ff', // Soft Off-white
         paper: '#FFFFFF',
     },
     dark: {
-        primary: '#2e9fd0ff',    // Light Blue
-        secondary: '#f58f00ff',  // Light Amber
-        background: '#0F172A', // Slate Dark
-        paper: '#274862ff',      // Slate Slightly Lighter
+        primary: '#D7195F',    // Light Blue
+        secondary: '#9123A6',  // Light Amber
+        background: '#0c1b27ff', // Slate Dark
+        paper: '#1c3243ff',      // Slate Slightly Lighter
     }
 };
 
@@ -38,18 +38,22 @@ export const getAppTheme = (mode: PaletteMode) => createTheme({
         fontSize: 12, // Default is 14px. Adjust this to globally change font size.
         fontFamily: '"Poppins", "Inter", "Roboto", "Segoe UI", sans-serif',
         h1: {
-            fontWeight: 700,
+            fontWeight: 600,
             letterSpacing: '-0.02em',
+            fontSize: 20,
         },
         h2: {
-            fontWeight: 700,
+            fontWeight: 600,
             letterSpacing: '-0.01em',
+            fontSize: 20,
         },
         h3: {
             fontWeight: 600,
+            fontSize: 20,
         },
         h4: {
             fontWeight: 600,
+            fontSize: 20,
         },
         h5: {
             fontWeight: 600,
@@ -70,6 +74,16 @@ export const getAppTheme = (mode: PaletteMode) => createTheme({
                     borderRadius: 8,
                     fontWeight: 600,
                 },
+                contained: ({ theme }) => ({
+                    background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                    color: '#fff',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                        background: `linear-gradient(45deg, ${theme.palette.primary.main} 10%, ${theme.palette.secondary.main} 110%)`,
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                    },
+                }),
             },
         },
         MuiCard: {
