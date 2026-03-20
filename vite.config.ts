@@ -8,14 +8,14 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logo-192.png', 'logo-512.png'],
+      includeAssets: ['web-app-manifest-192x192.png', 'web-app-manifest-512x512.png'],
       manifest: {
         id: 'bjj',
         name: 'BJJ Amigo',
         short_name: 'BJJ Amigo',
         description: 'A journal and technique tracker for Brazilian Jiu-Jitsu.',
         theme_color: '#ffffff',
-        background_color: '#ffffff',
+        background_color: '#a02197',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/bjj/',
@@ -24,28 +24,16 @@ export default defineConfig({
         categories: ['sports', 'health', 'fitness'],
         icons: [
           {
-            src: 'logo-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any'
+            "src": "web-app-manifest-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
           },
           {
-            src: 'logo-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'maskable'
-          },
-          {
-            src: 'logo-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any'
-          },
-          {
-            src: 'logo-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable'
+            "src": "web-app-manifest-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
           }
         ]
       }
