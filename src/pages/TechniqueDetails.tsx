@@ -6,7 +6,7 @@ import {
     List, ListItem, ListItemText, ListItemIcon, Rating,
     TextField
 } from '@mui/material';
-import { Favorite, MenuBook, School, EventNote, ArrowBack, EditNote } from '@mui/icons-material';
+import { Favorite, MenuBook, School, EventNote, ArrowBack, EditNote, Flag } from '@mui/icons-material';
 import { getTechniqueById, getUserProfile, updateUserProfile, getJournalEntries } from '../services/db';
 import type { Technique, UserProfile, MarkedStatus, JournalEntry } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -178,15 +178,6 @@ const TechniqueDetails = () => {
                             )}
                         </Box>
 
-                        {technique.images && technique.images.length > 0 && (
-                            <Box mb={4} sx={{ width: '100%', height: 300, bgcolor: 'action.disabledBackground', borderRadius: 2, overflow: 'hidden' }}>
-                                <img
-                                    src={technique.images[0]}
-                                    alt={technique.name}
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                />
-                            </Box>
-                        )}
 
                         <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>Description</Typography>
                         <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
@@ -316,16 +307,36 @@ const TechniqueDetails = () => {
                                     </Box>
                                 ) : (
                                     <Box display="flex" flexDirection="column" gap={1.5}>
-                                        <Typography variant="subtitle2" gutterBottom>Status Marker</Typography>
                                         <ToggleButton
                                             value="favorite"
                                             selected={!!currentStatus.favorite}
                                             onChange={() => handleStatusToggle('favorite')}
                                             fullWidth
                                             size="small"
-                                            color="primary"
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'flex-start',
+                                                px: 2,
+                                                py: 1,
+                                                mb: 1,
+                                                borderRadius: '8px !important',
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                transition: 'all 0.2s',
+                                                '&.Mui-selected': {
+                                                    bgcolor: 'warning.main',
+                                                    color: 'white',
+                                                    fontWeight: 'bold',
+                                                    borderColor: 'warning.main',
+                                                    boxShadow: '0 4px 8px rgba(255, 193, 7, 0.3)',
+                                                    '&:hover': { bgcolor: 'warning.dark' },
+                                                    '& .MuiSvgIcon-root': { color: 'white' }
+                                                }
+                                            }}
                                         >
-                                            <Favorite sx={{ mr: 1, fontSize: 20 }} /> Favorite
+                                            <Favorite sx={{ mr: 1, fontSize: 22 }} /> 
+                                            <Typography variant="body2" sx={{ fontWeight: 'inherit', textAlign: 'left' }}>Favorite</Typography>
+                                            {currentStatus.favorite && <Flag sx={{ ml: 'auto', fontSize: 18 }} />}
                                         </ToggleButton>
                                         <ToggleButton
                                             value="learning"
@@ -333,9 +344,30 @@ const TechniqueDetails = () => {
                                             onChange={() => handleStatusToggle('learning')}
                                             fullWidth
                                             size="small"
-                                            color="primary"
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'flex-start',
+                                                px: 2,
+                                                py: 1,
+                                                mb: 1,
+                                                borderRadius: '8px !important',
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                transition: 'all 0.2s',
+                                                '&.Mui-selected': {
+                                                    bgcolor: 'success.main',
+                                                    color: 'white',
+                                                    fontWeight: 'bold',
+                                                    borderColor: 'success.main',
+                                                    boxShadow: '0 4px 8px rgba(76, 175, 80, 0.3)',
+                                                    '&:hover': { bgcolor: 'success.dark' },
+                                                    '& .MuiSvgIcon-root': { color: 'white' }
+                                                }
+                                            }}
                                         >
-                                            <School sx={{ mr: 1, fontSize: 20 }} /> Currently Learning
+                                            <School sx={{ mr: 1, fontSize: 22 }} /> 
+                                            <Typography variant="body2" sx={{ fontWeight: 'inherit', textAlign: 'left' }}>Currently Learning</Typography>
+                                            {currentStatus.learning && <Flag sx={{ ml: 'auto', fontSize: 18 }} />}
                                         </ToggleButton>
                                         <ToggleButton
                                             value="toLearn"
@@ -343,12 +375,33 @@ const TechniqueDetails = () => {
                                             onChange={() => handleStatusToggle('toLearn')}
                                             fullWidth
                                             size="small"
-                                            color="primary"
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'flex-start',
+                                                px: 2,
+                                                py: 1,
+                                                mb: 1,
+                                                borderRadius: '8px !important',
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                transition: 'all 0.2s',
+                                                '&.Mui-selected': {
+                                                    bgcolor: 'info.main',
+                                                    color: 'white',
+                                                    fontWeight: 'bold',
+                                                    borderColor: 'info.main',
+                                                    boxShadow: '0 4px 8px rgba(33, 150, 243, 0.3)',
+                                                    '&:hover': { bgcolor: 'info.dark' },
+                                                    '& .MuiSvgIcon-root': { color: 'white' }
+                                                }
+                                            }}
                                         >
-                                            <MenuBook sx={{ mr: 1, fontSize: 20 }} /> To Learn
+                                            <MenuBook sx={{ mr: 1, fontSize: 22 }} /> 
+                                            <Typography variant="body2" sx={{ fontWeight: 'inherit', textAlign: 'left' }}>To Learn</Typography>
+                                            {currentStatus.toLearn && <Flag sx={{ ml: 'auto', fontSize: 18 }} />}
                                         </ToggleButton>
 
-                                        <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>Skill Level</Typography>
+                                        <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>My Skill Level</Typography>
                                         <Box display="flex" justifyContent="center">
                                             <Rating
                                                 name="technique-skill-level"
