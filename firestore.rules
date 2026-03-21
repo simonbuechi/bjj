@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Allow anyone to read and write techniques (so the "Add Sample Data" works for you right now)
+    match /techniques/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow users to read and write ONLY their own profile and journal data
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Default deny for everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
