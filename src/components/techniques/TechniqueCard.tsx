@@ -21,11 +21,8 @@ const TechniqueCard = ({ technique, userProfile }: TechniqueCardProps) => {
                         <Chip
                             label={technique.type}
                             size="small"
-                            sx={{
-                                textTransform: 'capitalize',
-                                bgcolor: 'action.selected',
-                                color: 'text.primary',
-                            }}
+                            color="primary"
+                            variant="outlined"
                         />
                         <Box sx={{ display: 'flex', gap: 0.5, color: 'text.secondary' }}>
                             {technique.videos && technique.videos.length > 0 && (

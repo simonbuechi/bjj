@@ -155,14 +155,13 @@ const TechniqueDetails = () => {
                                 >
                                     Back to Overview
                                 </Button>
-                                <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                                <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 600 }}>
                                     {technique.name}
                                 </Typography>
                                 <Chip
                                     label={technique.type}
-                                    color="secondary"
+                                    color="primary"
                                     variant="outlined"
-                                    sx={{ textTransform: 'capitalize' }}
                                 />
                             </Box>
                             {currentUser && (
@@ -268,7 +267,7 @@ const TechniqueDetails = () => {
                                                 }
                                             }}
                                         >
-                                            <Typography variant="body1" fontWeight="500">
+                                            <Typography variant="body1" fontWeight={600}>
                                                 {tech.name}
                                             </Typography>
                                             <Chip
@@ -276,12 +275,7 @@ const TechniqueDetails = () => {
                                                 size="small"
                                                 variant="outlined"
                                                 color="primary"
-                                                sx={{
-                                                    textTransform: 'capitalize',
-                                                    height: 20,
-                                                    fontSize: '0.75rem',
-                                                    pointerEvents: 'none'
-                                                }}
+                                                sx={{ pointerEvents: 'none' }}
                                             />
                                         </Paper>
                                     ))}

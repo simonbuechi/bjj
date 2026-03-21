@@ -121,7 +121,7 @@ const Techniques = () => {
                         >
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <FilterList color="action" />
-                                <Typography fontWeight={500}>Filters</Typography>
+                                <Typography fontWeight={600}>Filters</Typography>
 
                                 {(filter !== 'all' || markerFilter !== 'all' || skillFilter !== 'all') && (
                                     <Chip label="Active" size="small" color="primary" sx={{ ml: 1, height: 20 }} />
@@ -231,7 +231,7 @@ const Techniques = () => {
                                 <ListItemText
                                     primary={
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                                            <Typography variant="h6" component="div">
+                                            <Typography variant="body1" fontWeight={600}>
                                                 {technique.name}
                                             </Typography>
                                             <Chip
@@ -239,7 +239,6 @@ const Techniques = () => {
                                                 size="small"
                                                 color="primary"
                                                 variant="outlined"
-                                                sx={{ textTransform: 'capitalize' }}
                                             />
                                             {technique.videos && technique.videos.length > 0 && (
                                                 <Tooltip title="Has Video">

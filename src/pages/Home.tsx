@@ -55,14 +55,14 @@ const Home = () => {
     if (!currentUser) {
         return (
             <Container maxWidth="lg">
-                <Typography variant="h4" component="h1" gutterBottom sx={{ mb: { xs: 2, md: 4 }, fontWeight: 'bold' }}>
+                <Typography variant="h4" component="h1" gutterBottom sx={{ mb: { xs: 2, md: 4 }, fontWeight: 600 }}>
                     Welcome to BJJ Amigo
                 </Typography>
                 <Grid container spacing={{ xs: 2, md: 4 }} alignItems="stretch">
                     <Grid size={{ xs: 12, md: 6 }}>
                         <Card elevation={3} sx={{ height: '100%', borderRadius: 2 }}>
                             <CardContent sx={{ p: { xs: 2.5, sm: 4 }, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
-                                <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>About</Typography>
+                                <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>About</Typography>
                                 <Typography variant="body1" sx={{ mb: { xs: 2, md: 4 }, flexGrow: 1, fontSize: { xs: '1rem', md: '1.1rem' } }}>
                                     {APP_DESCRIPTION}
                                 </Typography>

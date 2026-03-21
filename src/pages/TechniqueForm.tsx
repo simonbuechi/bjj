@@ -347,7 +347,7 @@ export default function TechniqueForm() {
                                     {newImageFiles.map((file, index) => (
                                         <Box key={`new-${file.name}-${file.size}`} position="relative" width={100} height={100}>
                                             <img src={previewUrls[index]} alt={`New ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4, filter: 'brightness(0.7)' }} />
-                                            <Typography variant="caption" sx={{ position: 'absolute', bottom: 4, left: 4, color: 'white', fontWeight: 'bold' }}>New</Typography>
+                                            <Typography variant="caption" sx={{ position: 'absolute', bottom: 4, left: 4, color: 'white', fontWeight: 600 }}>New</Typography>
                                             <Button
                                                 size="small"
                                                 color="error"

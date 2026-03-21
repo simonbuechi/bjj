@@ -47,7 +47,7 @@ const Navbar = () => {
                         variant="h6"
                         sx={{
                             color: 'primary.main',
-                            fontWeight: 700
+                            fontWeight: 600
                         }}
                     >
                         BJJ Amigo

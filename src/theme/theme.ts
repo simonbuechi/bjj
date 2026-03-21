@@ -94,5 +94,31 @@ export const getAppTheme = (mode: PaletteMode) => createTheme({
                 },
             },
         },
+        MuiChip: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 100,
+                    fontWeight: 400,
+                },
+            },
+            variants: [
+                {
+                    props: { variant: 'outlined', color: 'primary' },
+                    style: ({ theme }) => ({
+                        backgroundColor: mode === 'dark'
+                            ? 'rgba(215, 25, 95, 0.12)'
+                            : 'rgba(145, 35, 166, 0.08)',
+                        border: 0,
+                        color: theme.palette.primary.main,
+                        textTransform: 'capitalize',
+                        fontSize: '0.75rem',
+                        '& .MuiChip-label': {
+                            paddingLeft: 10,
+                            paddingRight: 10,
+                        }
+                    })
+                }
+            ]
+        },
     },
 });

@@ -146,7 +146,7 @@ const Profile = () => {
 
                         <Grid container spacing={3}>
                             <Grid size={{ xs: 12 }}>
-                                <Typography variant="h5" fontWeight="bold">{profile.name || 'Anonymous Grappler'}</Typography>
+                                <Typography variant="h5" fontWeight={600}>{profile.name || 'Anonymous Grappler'}</Typography>
                                 <Typography color="text.secondary" sx={{ textTransform: 'capitalize' }}>
                                     {profile.belt || 'White'} Belt • {profile.stripes || 0} Stripes
                                 </Typography>

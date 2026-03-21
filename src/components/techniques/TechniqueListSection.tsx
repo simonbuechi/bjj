@@ -55,11 +55,9 @@ const TechniqueListSection = ({ icon, title, techniques, expanded, onToggle }: T
                                         variant="outlined"
                                         color="primary"
                                         sx={{
-                                            height: 20,
-                                            fontSize: '0.65rem',
-                                            textTransform: 'capitalize',
                                             flexShrink: 0,
-                                            minWidth: '75px'
+                                            minWidth: '75px',
+                                            pointerEvents: 'none'
                                         }}
                                     />
                                     <Typography variant="body2" sx={{ mr: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
