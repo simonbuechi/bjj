@@ -1,5 +1,5 @@
-import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
-import { Brightness4, Brightness7 } from '@mui/icons-material';
+import { AppBar, Toolbar, Typography, Button, Box, IconButton, Tooltip } from '@mui/material';
+import { Brightness4, Brightness7, Logout as LogoutIcon } from '@mui/icons-material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAppTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -62,13 +62,17 @@ const Navbar = () => {
                         </Button>
                     ))}
                     {currentUser && (
-                        <Button color="inherit" onClick={handleLogout}>
-                            Logout
-                        </Button>
+                        <Tooltip title="Logout">
+                            <IconButton color="inherit" onClick={handleLogout} aria-label="logout">
+                                <LogoutIcon />
+                            </IconButton>
+                        </Tooltip>
                     )}
-                    <IconButton sx={{ ml: 1 }} onClick={toggleColorMode} color="inherit">
-                        {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
-                    </IconButton>
+                    <Tooltip title={mode === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+                        <IconButton sx={{ ml: 1 }} onClick={toggleColorMode} color="inherit">
+                            {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
+                        </IconButton>
+                    </Tooltip>
                 </Box>
             </Toolbar>
         </AppBar>
