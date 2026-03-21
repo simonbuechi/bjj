@@ -1,4 +1,4 @@
-import { Card, CardActionArea, CardContent, CardMedia, Typography, Chip, Box, Tooltip } from '@mui/material';
+import { Card, CardActionArea, CardContent, Typography, Chip, Box, Tooltip } from '@mui/material';
 import { PlayCircleOutline, Link as LinkIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import type { Technique, UserProfile } from '../../types';
