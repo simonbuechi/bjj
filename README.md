@@ -1,8 +1,8 @@
-# BJJ Amigo 🥋
+# BJJ Amigo
 
 **BJJ Amigo** is a modern, light-weight PWA (Progressive Web App) designed for Brazilian Jiu-Jitsu practitioners to track their training journey, techniques, and progress.
 
-## ✨ Features
+## Features
 
 - **Personal Journal**: Log your training sessions, focus areas, and notes from every roll.
 - **Technique Library**: Organize and search your techniques by category, position, and belt level.
@@ -10,7 +10,7 @@
 - **PWA Ready**: Install BJJ Amigo on your mobile device for a native app-like experience, even offline.
 - **Real-time Sync**: Powered by Firebase for seamless data synchronization across all your devices.
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **Frontend**: React 19, TypeScript, Vite
 - **Styling**: Material UI (MUI) with Emotion
@@ -18,7 +18,7 @@
 - **PWA**: `vite-plugin-pwa` for offline capabilities and installation
 - **Routing**: React Router 7
 
-## 🛠️ Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -54,14 +54,14 @@
    npm run dev
    ```
 
-## 📜 Available Scripts
+## Available Scripts
 
 - `npm run dev`: Starts the Vite development server.
 - `npm run build`: Compiles the application for production.
 - `npm run lint`: Runs ESLint for code quality checks.
 - `npm run preview`: Previews the production build locally.
 
-## 📱 Mobile Installation
+## Mobile Installation
 
 BJJ Amigo is a PWA. When visiting the app URL on your mobile browser, look for the "Add to Home Screen" or "Install App" prompt to get the best experience.
 

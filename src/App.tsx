@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import TechniqueDetails from './pages/TechniqueDetails';
 import TechniqueForm from './pages/TechniqueForm';
 import Journal from './pages/Journal';
+import UserJournalAPI from './pages/UserJournalAPI';
 import ReloadPrompt from './components/common/ReloadPrompt';
 
 function App() {
@@ -60,6 +61,7 @@ function App() {
                   }
                 />
               </Route>
+              <Route path="/user/:userId/log" element={<UserJournalAPI />} />
             </Routes>
           </Router>
           <ReloadPrompt />
