@@ -20,7 +20,7 @@ function App() {
     <PwaProvider>
       <AuthProvider>
         <TechniquesProvider>
-          <Router basename="/bjj/">
+          <Router>
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<Home />} />
